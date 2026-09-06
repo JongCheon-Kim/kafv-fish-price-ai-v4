@@ -53,12 +53,26 @@ button,input,select{font:inherit} button{cursor:pointer}
 body.big .bubble{font-size:15px}body.big .menu strong{font-size:14px}body.big .field label{font-size:12px}
 
 .overview-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:9px 0 12px}.overview-stat{background:#f4f8fb;border:1px solid #dbe6ef;border-radius:12px;padding:8px 5px;text-align:center}.overview-stat b{display:block;font-size:16px}.overview-stat small{font-size:10px;color:#637381}.overview-section{border-top:1px solid #e6edf3;padding:10px 0}.overview-section:first-of-type{border-top:0}.overview-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.overview-title strong{font-size:14px}.overview-title .badge{flex:0 0 auto}.overview-mini{background:#f8fafc;border:1px solid #e4eaf0;border-radius:11px;padding:8px 10px;margin:5px 0;font-size:12px;line-height:1.55}.overview-mini .kv{font-size:12px}.overview-empty{font-size:12px;color:#6b7280;padding:4px 0}.overview-note{font-size:11px;color:#617080;line-height:1.5;margin-top:7px}.overview-detail{border:0;background:#edf5ff;color:#0b5ed7;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer}.overview-loading{display:flex;align-items:center;gap:7px;color:#5c6b78;font-size:12px}.overview-loading:before{content:"";width:12px;height:12px;border:2px solid #c9d3dc;border-top-color:#111;border-radius:50%;animation:ovspin .8s linear infinite}@keyframes ovspin{to{transform:rotate(360deg)}}
+/* KAFV brand intro v1 */
+.kafv-intro{position:fixed;inset:0;z-index:99999;background:#b9dcf5;display:flex;align-items:stretch;justify-content:center;opacity:1;visibility:visible;transition:opacity .42s ease,visibility .42s ease;overflow:hidden}
+.kafv-intro.hide{opacity:0;visibility:hidden;pointer-events:none}
+.kafv-intro img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.kafv-intro-skip{position:absolute;right:calc(14px + env(safe-area-inset-right));top:calc(14px + env(safe-area-inset-top));border:1px solid rgba(255,255,255,.75);background:rgba(0,51,102,.38);color:#fff;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800;backdrop-filter:blur(4px)}
+.logo{overflow:hidden;background:#fff;padding:0}
+.logo img{width:100%;height:100%;display:block;object-fit:cover}
+@media(prefers-reduced-motion:reduce){.kafv-intro{transition:none}}
+
 </style>
 </head>
 <body>
+<div class="kafv-intro" id="kafvIntro" role="dialog" aria-label="KAFV 수산물 가격정보 AI 시작 화면">
+  <img src="kafv-fish-price-ai-intro.png" alt="KAFV 수산물 가격정보 AI - 수산물 가격 정보를 내손에, 한국AI어촌가치연구소 KAFV, 제작자 김종천">
+  <button type="button" class="kafv-intro-skip" id="kafvIntroSkip" aria-label="시작 화면 건너뛰기">건너뛰기</button>
+</div>
+
 <div class="stage"><main class="phone" id="phone">
 <header class="header">
-  <div class="logo">🐟</div>
+  <div class="logo"><img src="kafv-fish-price-ai-icon-192.png" alt="KAFV"></div>
   <div class="brand"><div class="title">KAFV 수산물 가격정보 AI</div><div class="sub"><span class="dot"></span>aT 공공데이터 연계 · v0.17</div></div>
   <button class="hbtn" id="fontBtn" title="글자 크기">가</button>
   <button class="hbtn" id="settingsBtn" title="설정">⚙</button>
@@ -88,6 +102,27 @@ body.big .bubble{font-size:15px}body.big .menu strong{font-size:14px}body.big .f
 <div class="sheet-bg" id="sheetBg"><section class="sheet" id="sheet"></section></div>
 </main></div>
 <script>
+const KAFV_INTRO_SESSION_KEY="kafv_fish_price_intro_seen_v1";
+(function initKafvIntro(){
+  const intro=document.getElementById("kafvIntro");
+  const skip=document.getElementById("kafvIntroSkip");
+  if(!intro)return;
+  let seen=false;
+  try{seen=sessionStorage.getItem(KAFV_INTRO_SESSION_KEY)==="1"}catch(_){}
+  const closeIntro=()=>{
+    if(intro.classList.contains("hide"))return;
+    intro.classList.add("hide");
+    intro.setAttribute("aria-hidden","true");
+    try{sessionStorage.setItem(KAFV_INTRO_SESSION_KEY,"1")}catch(_){}
+    setTimeout(()=>intro.remove(),520);
+  };
+  if(seen){intro.remove();return;}
+  skip?.addEventListener("click",closeIntro);
+  intro.addEventListener("click",e=>{if(e.target===intro||e.target.tagName==="IMG")closeIntro()});
+  const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  setTimeout(closeIntro,reduce?700:1900);
+})();
+
 const API_BASE="https://kafv-fish-price-api.123kjc.workers.dev";
 const PRICE_CATEGORY="600";
 const DEFAULT_PRICE_ITEM={name:"고등어",code:"611"};

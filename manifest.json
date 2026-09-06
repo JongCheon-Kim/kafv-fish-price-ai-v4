@@ -1,12 +1,12 @@
 {
-  "name": "KAFV 수산물 가격정보 AI v4",
-  "short_name": "수산가격AI v4",
+  "name": "KAFV 수산물 가격정보 AI",
+  "short_name": "수산가격AI",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#BACEE0",
   "theme_color": "#FEE500",
-  "description": "aT 공공데이터 기반 KAFV 수산물 가격정보 AI v0.17 - 품목명 하나로 관련 Endpoint를 자동 탐색하는 v4",
+  "description": "한국AI어촌가치연구소 KAFV 수산물 가격정보 AI - aT 공공데이터 기반 가격·추세·지역·시장·경매·온라인 거래정보 조회",
   "icons": [
     {
       "src": "kafv-fish-price-ai-icon-192.png",

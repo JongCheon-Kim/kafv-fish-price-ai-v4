@@ -1,5 +1,5 @@
-const CACHE="kafv-fish-price-ai-v4-v017";
-const ASSETS=["./","./index.html","./manifest.json","./kafv-fish-price-ai-icon-192.png","./kafv-fish-price-ai-icon-512.png"];
+const CACHE="kafv-fish-price-ai-v4-v018-brand";
+const ASSETS=["./","./index.html","./manifest.json","./kafv-fish-price-ai-icon-192.png","./kafv-fish-price-ai-icon-512.png","./kafv-fish-price-ai-intro.png"];
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
 self.addEventListener("activate",e=>{e.waitUntil(Promise.all([clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))]))});
 self.addEventListener("fetch",e=>{
