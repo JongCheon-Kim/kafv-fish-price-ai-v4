@@ -1,7 +1,7 @@
 /*
 ============================================================
 KAFV 수산물 가격정보 AI
-Cloudflare Worker API Gateway v0.6
+Cloudflare Worker API Gateway v0.7.2
 ============================================================
 
 역할
@@ -21,8 +21,16 @@ Cloudflare Worker API Gateway v0.6
 */
 
 const BASE = "https://apis.data.go.kr/B552845";
-const WORKER_VERSION = "0.6";
+const WORKER_VERSION = "0.7.2";
 const DEFAULT_ALLOWED_ORIGINS = ["https://jongcheon-kim.github.io"];
+
+// v0.7.2 안정화 정책: v0.7.1의 재시도/timeout을 유지하고,
+// item-overview의 탐색 예산을 Endpoint별로 배분해 희소 품목에서도 전체 상태를 끝까지 판정한다.
+const UPSTREAM_TIMEOUT_MS = 8000;
+const UPSTREAM_MAX_ATTEMPTS = 2;
+const TRANSIENT_UPSTREAM_STATUS = new Set([408, 425, 429, 500, 502, 503, 504, 520, 521, 522, 523, 524]);
+const ITEM_OVERVIEW_SUBREQUEST_BUDGET = 40;
+const ITEM_OVERVIEW_DAY_EQ_PROBE_LIMIT = 10;
 
 const ROUTES = {
   "/api/goods":       { path: "/katCode/goods",            key: "AT_KATCODE_KEY" },
@@ -126,7 +134,40 @@ function passParams(sourceUrl, targetUrl, blockedExtra = []) {
   setDefaultQuery(targetUrl.searchParams);
 }
 
-async function fetchUpstream(route, params, serviceKey) {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function diagnosticId() {
+  try { return crypto.randomUUID(); }
+  catch { return `kafv-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`; }
+}
+
+function retryableStatus(status) {
+  return TRANSIENT_UPSTREAM_STATUS.has(Number(status));
+}
+
+function retryDelayMs(status, attempt) {
+  if (Number(status) === 429) return 700 * attempt;
+  return 250 * attempt;
+}
+
+function createSubrequestBudget(max = ITEM_OVERVIEW_SUBREQUEST_BUDGET) {
+  return { used: 0, max };
+}
+
+function reserveSubrequest(budget) {
+  if (!budget) return;
+  if (budget.used >= budget.max) {
+    const error = new Error(`Item overview subrequest budget exceeded (${budget.used}/${budget.max})`);
+    error.code = "KAFV_SUBREQUEST_BUDGET";
+    error.subrequestsUsed = budget.used;
+    throw error;
+  }
+  budget.used += 1;
+}
+
+async function fetchUpstream(route, params, serviceKey, budget = null) {
   const upstream = new URL(BASE + route.path);
   for (const [key, value] of params.entries()) {
     if (key !== "serviceKey") upstream.searchParams.append(key, value);
@@ -134,14 +175,74 @@ async function fetchUpstream(route, params, serviceKey) {
   setDefaultQuery(upstream.searchParams);
   upstream.searchParams.set("serviceKey", serviceKey);
 
-  const response = await fetch(upstream.toString(), {
-    method: "GET",
-    headers: { "Accept": "application/json" }
-  });
-  const text = await response.text();
-  let data = text;
-  try { data = JSON.parse(text); } catch {}
-  return { response, text, data };
+  const diagId = diagnosticId();
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= UPSTREAM_MAX_ATTEMPTS; attempt++) {
+    reserveSubrequest(budget);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+    const started = Date.now();
+    try {
+      const response = await fetch(upstream.toString(), {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+        signal: controller.signal
+      });
+      const text = await response.text();
+      let data = text;
+      try { data = JSON.parse(text); } catch {}
+
+      const meta = {
+        diagnosticId: diagId,
+        attempts: attempt,
+        elapsedMs: Date.now() - started,
+        upstreamStatus: response.status
+      };
+
+      if (response.ok || !retryableStatus(response.status) || attempt >= UPSTREAM_MAX_ATTEMPTS) {
+        return { response, text, data, meta };
+      }
+
+      console.warn("KAFV upstream transient response", JSON.stringify({
+        diagnosticId: diagId,
+        route: route.path,
+        status: response.status,
+        attempt,
+        elapsedMs: meta.elapsedMs
+      }));
+      await sleep(retryDelayMs(response.status, attempt));
+    } catch (error) {
+      lastError = error;
+      if (error?.code === "KAFV_SUBREQUEST_BUDGET") throw error;
+      const isAbort = error?.name === "AbortError" || String(error?.message || error).toLowerCase().includes("abort");
+      console.warn("KAFV upstream fetch exception", JSON.stringify({
+        diagnosticId: diagId,
+        route: route.path,
+        attempt,
+        type: isAbort ? "timeout" : "network",
+        message: String(error?.message || error).slice(0, 160)
+      }));
+      if (attempt >= UPSTREAM_MAX_ATTEMPTS) {
+        const e = new Error(isAbort
+          ? `Upstream timeout after ${UPSTREAM_TIMEOUT_MS}ms`
+          : `Upstream network failure: ${String(error?.message || error)}`);
+        e.diagnosticId = diagId;
+        e.attempts = attempt;
+        e.transient = true;
+        throw e;
+      }
+      await sleep(retryDelayMs(0, attempt));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  const e = new Error(`Upstream fetch failed: ${String(lastError?.message || lastError || "unknown")}`);
+  e.diagnosticId = diagId;
+  e.attempts = UPSTREAM_MAX_ATTEMPTS;
+  e.transient = true;
+  throw e;
 }
 
 function normalizedBody(raw) {
@@ -326,9 +427,12 @@ async function handleSmartSearch(url, request, env) {
     } catch (error) {
       return json({
         error: "Upstream fetch failed",
+        userMessage: "공공 API가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해 주십시오.",
         target: targetName,
-        message: String(error?.message || error)
-      }, 502, corsHeaders);
+        message: String(error?.message || error),
+        diagnosticId: error?.diagnosticId || "",
+        attempts: error?.attempts || 0
+      }, 503, corsHeaders);
     }
 
     const rowCount = itemsOf(result.data).length;
@@ -351,8 +455,13 @@ async function handleSmartSearch(url, request, env) {
         error: "Upstream API error",
         upstreamStatus: result.response.status,
         kafvSearch: lastMeta,
-        data: result.data
-      }, 502, corsHeaders);
+        data: result.data,
+        diagnosticId: result.meta?.diagnosticId || "",
+        upstreamAttempts: result.meta?.attempts || 1,
+        userMessage: retryableStatus(result.response.status)
+          ? "공공 API가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해 주십시오."
+          : "공공 API 응답을 처리하지 못했습니다. 잠시 후 다시 시도해 주십시오."
+      }, retryableStatus(result.response.status) ? 503 : 502, corsHeaders);
     }
 
     if (rowCount > 0) {
@@ -383,11 +492,22 @@ async function handleSmartSearch(url, request, env) {
 
 
 // ---------------------------------------------------------------------------
-// v0.6 품목 통합조회
-// 가격 API의 ctgry_cd/item_cd 코드체계 안에서 8개 가격 Endpoint를 자동 탐색한다.
-// 경매/온라인은 별도 코드체계이므로 이 Worker 통합조회에 억지로 합치지 않고,
-// 프론트엔드에서 공식 경매 코드표/실제 온라인 응답명칭을 이용해 별도 탐색한다.
+// v0.7 품목 통합조회
+// 핵심: /recent 날짜 하나를 공통 referenceDate로 사용하지 않는다.
+// 각 가격 Endpoint가 자기 자료의 최신 실제 날짜/월을 독립적으로 탐색한다.
 // ---------------------------------------------------------------------------
+
+const LATEST_CONFIG = {
+  recent:    { strategy: "self",        dateField: "exmn_ymd" },
+  trend:     { strategy: "day-eq",      dateField: "exmn_ymd", maxLookbackDays: 30 },
+  change:    { strategy: "day-eq",      dateField: "exmn_ymd", maxLookbackDays: 30 },
+  daily:     { strategy: "day-range",   dateField: "exmn_ymd", windows: [7, 14, 30] },
+  region:    { strategy: "day-range",   dateField: "exmn_ymd", windows: [7, 14, 30] },
+  wholesale: { strategy: "day-range",   dateField: "exmn_ymd", windows: [7, 14, 30] },
+  retail:    { strategy: "day-range",   dateField: "exmn_ymd", windows: [7, 14, 30] },
+  yearmonth: { strategy: "month-range", dateField: "exmn_ym",  windows: [3, 6, 12] }
+};
+
 function compactSmartResult(core, limit = 5) {
   const rows = itemsOf(core?.data);
   return {
@@ -422,7 +542,12 @@ async function runSmartCore(targetName, inputParams, env, widenDate = true) {
     try {
       result = await fetchUpstream(route, a.params, serviceKey);
     } catch (error) {
-      return { ok: false, error: String(error?.message || error), target: targetName, data: null, kafvSearch: lastMeta };
+      return {
+        ok: false, error: String(error?.message || error), target: targetName, data: null, kafvSearch: lastMeta,
+        transient: error?.code !== "KAFV_SUBREQUEST_BUDGET",
+        budgetExceeded: error?.code === "KAFV_SUBREQUEST_BUDGET",
+        diagnosticId: error?.diagnosticId || "", upstreamAttempts: error?.attempts || 0
+      };
     }
 
     const rowCount = itemsOf(result.data).length;
@@ -440,7 +565,12 @@ async function runSmartCore(targetName, inputParams, env, widenDate = true) {
     };
 
     if (!result.response.ok) {
-      return { ok: false, error: `Upstream HTTP ${result.response.status}`, target: targetName, data: result.data, kafvSearch: lastMeta };
+      return {
+        ok: false, error: `Upstream HTTP ${result.response.status}`, target: targetName, data: result.data, kafvSearch: lastMeta,
+        transient: retryableStatus(result.response.status),
+        upstreamStatus: result.response.status,
+        diagnosticId: result.meta?.diagnosticId || "", upstreamAttempts: result.meta?.attempts || 1
+      };
     }
     if (rowCount > 0) return { ok: true, target: targetName, data: result.data, kafvSearch: lastMeta };
   }
@@ -468,8 +598,96 @@ function kstYmd() {
   return `${d.getUTCFullYear()}${String(d.getUTCMonth()+1).padStart(2,"0")}${String(d.getUTCDate()).padStart(2,"0")}`;
 }
 
+function kstYm() {
+  return kstYmd().slice(0, 6);
+}
+
+function latestFieldFromRows(rows, field, pattern) {
+  return rows
+    .map(r => String(r?.[field] || ""))
+    .filter(x => pattern.test(x))
+    .sort()
+    .reverse()[0] || "";
+}
+
 function latestYmdFromRows(rows) {
-  return rows.map(r => String(r?.exmn_ymd || "")).filter(x => /^\d{8}$/.test(x)).sort().reverse()[0] || "";
+  return latestFieldFromRows(rows, "exmn_ymd", /^\d{8}$/);
+}
+
+function latestYmFromRows(rows) {
+  return latestFieldFromRows(rows, "exmn_ym", /^\d{6}$/);
+}
+
+function sortRowsNewest(rows, field) {
+  return [...rows].sort((a, b) => String(b?.[field] || "").localeCompare(String(a?.[field] || "")));
+}
+
+function rowsAtLatest(rows, field, latestValue) {
+  if (!latestValue) return rows;
+  const hit = rows.filter(r => String(r?.[field] || "") === latestValue);
+  return hit.length ? hit : rows;
+}
+
+function upstreamLogicalError(raw) {
+  let x = raw;
+  if (typeof x === "string") {
+    try { x = JSON.parse(x); } catch { return null; }
+  }
+  const header = x?.response?.header ?? x?.header ?? x?.response?.body?.header ?? null;
+  const code = String(header?.resultCode ?? header?.result_code ?? "").trim();
+  if (!code || /^0+$/.test(code)) return null;
+  return {
+    code,
+    message: String(header?.resultMsg ?? header?.resultMessage ?? header?.result_msg ?? "Upstream API logical error")
+  };
+}
+
+async function fetchTargetRows(targetName, inputParams, env, budget = null) {
+  const route = SMART_TARGETS[targetName];
+  if (!route) return { ok: false, error: "Invalid smart-search target", rows: [], data: null, status: 400 };
+
+  const serviceKey = serviceKeyFor(route, env);
+  if (!serviceKey) return { ok: false, error: `API secret is not configured: ${route.key}`, rows: [], data: null, status: 500 };
+
+  const params = cloneParams(inputParams);
+  setDefaultQuery(params);
+  if (+params.get("numOfRows") < 1000) params.set("numOfRows", "1000");
+  params.set("pageNo", "1");
+  params.set("returnType", "json");
+
+  let result;
+  try {
+    result = await fetchUpstream(route, params, serviceKey, budget);
+  } catch (error) {
+    return {
+      ok: false, error: String(error?.message || error), rows: [], data: null, status: 502, params,
+      transient: error?.code !== "KAFV_SUBREQUEST_BUDGET",
+      budgetExceeded: error?.code === "KAFV_SUBREQUEST_BUDGET",
+      diagnosticId: error?.diagnosticId || "", upstreamAttempts: error?.attempts || 0
+    };
+  }
+
+  if (!result.response.ok) {
+    return {
+      ok: false, error: `Upstream HTTP ${result.response.status}`, rows: [], data: result.data, status: result.response.status, params,
+      transient: retryableStatus(result.response.status),
+      diagnosticId: result.meta?.diagnosticId || "", upstreamAttempts: result.meta?.attempts || 1
+    };
+  }
+
+  const logicalError = upstreamLogicalError(result.data);
+  if (logicalError) {
+    return {
+      ok: false,
+      error: `Upstream API ${logicalError.code}: ${logicalError.message}`,
+      rows: [],
+      data: result.data,
+      status: 502,
+      params
+    };
+  }
+
+  return { ok: true, error: "", rows: itemsOf(result.data), data: result.data, status: 200, params };
 }
 
 function baseItemParams(categoryCd, itemCd) {
@@ -482,6 +700,223 @@ function baseItemParams(categoryCd, itemCd) {
   return p;
 }
 
+function latestCoreResult(targetName, ok, rows, latestDate, meta, error = "", extra = {}) {
+  return {
+    ok,
+    target: targetName,
+    rows,
+    latestDate,
+    meta,
+    error,
+    ...extra
+  };
+}
+
+async function runEndpointLatest(targetName, inputParams, env, budget = null, options = {}) {
+  const cfg = LATEST_CONFIG[targetName];
+  if (!cfg) return latestCoreResult(targetName, false, [], "", null, "Latest strategy is not configured");
+
+  const base = cloneParams(inputParams);
+  setDefaultQuery(base);
+  if (+base.get("numOfRows") < 1000) base.set("numOfRows", "1000");
+  base.set("pageNo", "1");
+  base.set("returnType", "json");
+
+  const requestedFilters = sanitizeFilterSnapshot(base);
+  let probeCount = 0;
+  const requestedMaxProbes = Number(options?.maxProbes || 0);
+
+  if (cfg.strategy === "self") {
+    probeCount++;
+    const one = await fetchTargetRows(targetName, base, env, budget);
+    if (!one.ok) {
+      return latestCoreResult(targetName, false, [], "", {
+        target: targetName,
+        strategy: cfg.strategy,
+        probeCount,
+        requestedFilters,
+        matchedFilters: sanitizeFilterSnapshot(one.params || base)
+      }, one.error, { transient: one.transient, budgetExceeded: one.budgetExceeded, diagnosticId: one.diagnosticId || "", upstreamAttempts: one.upstreamAttempts || 0, upstreamStatus: one.status || 0 });
+    }
+    const latestDate = latestYmdFromRows(one.rows);
+    const rows = rowsAtLatest(sortRowsNewest(one.rows, cfg.dateField), cfg.dateField, latestDate);
+    return latestCoreResult(targetName, true, rows, latestDate, {
+      target: targetName,
+      strategy: cfg.strategy,
+      probeCount,
+      latestDate,
+      requestedFilters,
+      matchedFilters: sanitizeFilterSnapshot(one.params || base)
+    });
+  }
+
+  if (cfg.strategy === "day-eq") {
+    const today = kstYmd();
+    const maxOffset = requestedMaxProbes > 0
+      ? Math.min(cfg.maxLookbackDays, Math.max(0, requestedMaxProbes - 1))
+      : cfg.maxLookbackDays;
+    for (let offset = 0; offset <= maxOffset; offset++) {
+      const date = addDays(today, -offset);
+      const p = cloneParams(base);
+      deleteCond(p, "exmn_ymd");
+      p.set(canonicalCondKey("exmn_ymd", "EQ"), date);
+      probeCount++;
+      const one = await fetchTargetRows(targetName, p, env, budget);
+      if (!one.ok) {
+        return latestCoreResult(targetName, false, [], "", {
+          target: targetName,
+          strategy: cfg.strategy,
+          probeCount,
+          latestProbeDate: date,
+          requestedFilters,
+          matchedFilters: sanitizeFilterSnapshot(one.params || p)
+        }, one.error, { transient: one.transient, budgetExceeded: one.budgetExceeded, diagnosticId: one.diagnosticId || "", upstreamAttempts: one.upstreamAttempts || 0, upstreamStatus: one.status || 0 });
+      }
+      if (one.rows.length) {
+        const latestDate = latestYmdFromRows(one.rows) || date;
+        const rows = rowsAtLatest(sortRowsNewest(one.rows, cfg.dateField), cfg.dateField, latestDate);
+        return latestCoreResult(targetName, true, rows, latestDate, {
+          target: targetName,
+          strategy: cfg.strategy,
+          probeCount,
+          latestDate,
+          lookbackDays: offset,
+          requestedFilters,
+          matchedFilters: sanitizeFilterSnapshot(one.params || p)
+        });
+      }
+    }
+    const searchComplete = maxOffset >= cfg.maxLookbackDays;
+    return latestCoreResult(targetName, true, [], "", {
+      target: targetName,
+      strategy: cfg.strategy,
+      probeCount,
+      latestDate: "",
+      searchedFrom: addDays(kstYmd(), -maxOffset),
+      searchedTo: kstYmd(),
+      fullLookbackDays: cfg.maxLookbackDays,
+      requestedFilters,
+      matchedFilters: requestedFilters
+    }, "", {
+      searchComplete,
+      unconfirmed: !searchComplete,
+      unconfirmedReason: searchComplete ? "" : `overview-probe-cap:${probeCount}/${cfg.maxLookbackDays + 1}`
+    });
+  }
+
+  if (cfg.strategy === "day-range") {
+    const today = kstYmd();
+    for (const days of cfg.windows) {
+      const p = cloneParams(base);
+      deleteCond(p, "exmn_ymd");
+      p.set(canonicalCondKey("exmn_ymd", "GTE"), addDays(today, -(days - 1)));
+      p.set(canonicalCondKey("exmn_ymd", "LTE"), today);
+      probeCount++;
+      const one = await fetchTargetRows(targetName, p, env, budget);
+      if (!one.ok) {
+        return latestCoreResult(targetName, false, [], "", {
+          target: targetName,
+          strategy: cfg.strategy,
+          probeCount,
+          windowDays: days,
+          requestedFilters,
+          matchedFilters: sanitizeFilterSnapshot(one.params || p)
+        }, one.error, { transient: one.transient, budgetExceeded: one.budgetExceeded, diagnosticId: one.diagnosticId || "", upstreamAttempts: one.upstreamAttempts || 0, upstreamStatus: one.status || 0 });
+      }
+      if (one.rows.length) {
+        const latestDate = latestYmdFromRows(one.rows);
+        const rows = rowsAtLatest(sortRowsNewest(one.rows, cfg.dateField), cfg.dateField, latestDate);
+        return latestCoreResult(targetName, true, rows, latestDate, {
+          target: targetName,
+          strategy: cfg.strategy,
+          probeCount,
+          windowDays: days,
+          latestDate,
+          requestedFilters,
+          matchedFilters: sanitizeFilterSnapshot(one.params || p)
+        });
+      }
+    }
+    return latestCoreResult(targetName, true, [], "", {
+      target: targetName,
+      strategy: cfg.strategy,
+      probeCount,
+      latestDate: "",
+      searchedFrom: addDays(kstYmd(), -(cfg.windows[cfg.windows.length - 1] - 1)),
+      searchedTo: kstYmd(),
+      requestedFilters,
+      matchedFilters: requestedFilters
+    });
+  }
+
+  if (cfg.strategy === "month-range") {
+    const thisYm = kstYm();
+    for (const months of cfg.windows) {
+      const p = cloneParams(base);
+      deleteCond(p, "exmn_ym");
+      p.set(canonicalCondKey("exmn_ym", "GTE"), addMonths(thisYm, -(months - 1)));
+      p.set(canonicalCondKey("exmn_ym", "LTE"), thisYm);
+      probeCount++;
+      const one = await fetchTargetRows(targetName, p, env, budget);
+      if (!one.ok) {
+        return latestCoreResult(targetName, false, [], "", {
+          target: targetName,
+          strategy: cfg.strategy,
+          probeCount,
+          windowMonths: months,
+          requestedFilters,
+          matchedFilters: sanitizeFilterSnapshot(one.params || p)
+        }, one.error, { transient: one.transient, budgetExceeded: one.budgetExceeded, diagnosticId: one.diagnosticId || "", upstreamAttempts: one.upstreamAttempts || 0, upstreamStatus: one.status || 0 });
+      }
+      if (one.rows.length) {
+        const latestDate = latestYmFromRows(one.rows);
+        const rows = rowsAtLatest(sortRowsNewest(one.rows, cfg.dateField), cfg.dateField, latestDate);
+        return latestCoreResult(targetName, true, rows, latestDate, {
+          target: targetName,
+          strategy: cfg.strategy,
+          probeCount,
+          windowMonths: months,
+          latestDate,
+          requestedFilters,
+          matchedFilters: sanitizeFilterSnapshot(one.params || p)
+        });
+      }
+    }
+    return latestCoreResult(targetName, true, [], "", {
+      target: targetName,
+      strategy: cfg.strategy,
+      probeCount,
+      latestDate: "",
+      searchedFrom: addMonths(kstYm(), -(cfg.windows[cfg.windows.length - 1] - 1)),
+      searchedTo: kstYm(),
+      requestedFilters,
+      matchedFilters: requestedFilters
+    });
+  }
+
+  return latestCoreResult(targetName, false, [], "", null, `Unknown latest strategy: ${cfg.strategy}`);
+}
+
+function compactLatestResult(core, limit = 5) {
+  const rowCount = Array.isArray(core?.rows) ? core.rows.length : 0;
+  let status = "empty";
+  if (rowCount > 0) status = "available";
+  else if (core?.budgetExceeded || core?.unconfirmed || core?.searchComplete === false) status = "unconfirmed";
+  else if (!core?.ok) status = "error";
+  return {
+    ok: Boolean(core?.ok),
+    status,
+    rowCount,
+    rows: Array.isArray(core?.rows) ? core.rows.slice(0, limit) : [],
+    latestDate: String(core?.latestDate || ""),
+    meta: core?.meta || null,
+    error: core?.error || "",
+    searchComplete: core?.searchComplete !== false && !core?.unconfirmed && !core?.budgetExceeded,
+    unconfirmedReason: core?.unconfirmedReason || (core?.budgetExceeded ? "item-overview-subrequest-budget" : ""),
+    budgetExceeded: Boolean(core?.budgetExceeded)
+  };
+}
+
 async function handleItemOverview(url, request, env) {
   const corsHeaders = getCorsHeaders(request, env);
   const itemCd = String(url.searchParams.get("item_cd") || "").trim();
@@ -490,65 +925,93 @@ async function handleItemOverview(url, request, env) {
 
   if (!itemCd) return json({ error: "item_cd is required" }, 400, corsHeaders);
 
-  const results = {};
   const base = baseItemParams(categoryCd, itemCd);
+  // 비용이 적은 Endpoint를 먼저 확인하고, 일자 단건탐색(trend/change)은 뒤에서 제한적으로 탐색한다.
+  const order = ["recent", "daily", "region", "wholesale", "retail", "yearmonth", "trend", "change"];
+  const results = {};
+  const budget = createSubrequestBudget();
+  let budgetStopped = false;
 
-  // 1) 최근가격을 먼저 찾아 실제 최신 조사일을 기준일로 잡는다.
-  const recent = await runSmartCore("recent", base, env, false);
-  results.recent = compactSmartResult(recent, 5);
-  const recentRows = itemsOf(recent?.data);
-  const referenceDate = latestYmdFromRows(recentRows) || addDays(kstYmd(), -1);
+  // 각 Endpoint가 오늘/현재월부터 독립적으로 최신 실제 자료를 찾는다.
+  // /recent 결과의 날짜는 다른 Endpoint에 전달하지 않는다.
+  for (const target of order) {
+    if (budgetStopped) {
+      results[target] = compactLatestResult({
+        ok: false,
+        rows: [],
+        latestDate: "",
+        meta: { target, strategy: LATEST_CONFIG[target]?.strategy || "", skippedAfterBudget: true },
+        error: `Item overview subrequest budget reached (${budget.used}/${budget.max})`,
+        budgetExceeded: true,
+        unconfirmed: true,
+        searchComplete: false,
+        unconfirmedReason: "item-overview-subrequest-budget"
+      }, 5);
+      continue;
+    }
 
-  // 2) 같은 품목코드로 나머지 가격 Endpoint를 넓게 탐색한다.
-  const datedEq = baseItemParams(categoryCd, itemCd);
-  datedEq.set(canonicalCondKey("exmn_ymd", "EQ"), referenceDate);
+    const options = (target === "trend" || target === "change")
+      ? { maxProbes: ITEM_OVERVIEW_DAY_EQ_PROBE_LIMIT }
+      : {};
+    const core = await runEndpointLatest(target, base, env, budget, options);
+    results[target] = compactLatestResult(core, 5);
 
-  const datedRange = baseItemParams(categoryCd, itemCd);
-  datedRange.set(canonicalCondKey("exmn_ymd", "GTE"), referenceDate);
-  datedRange.set(canonicalCondKey("exmn_ymd", "LTE"), referenceDate);
+    if (core?.budgetExceeded) {
+      budgetStopped = true;
+      continue;
+    }
 
-  const periodRange = baseItemParams(categoryCd, itemCd);
-  periodRange.set(canonicalCondKey("exmn_ymd", "GTE"), addDays(referenceDate, -30));
-  periodRange.set(canonicalCondKey("exmn_ymd", "LTE"), referenceDate);
-
-  const refYm = referenceDate.slice(0, 6);
-  const ymRange = baseItemParams(categoryCd, itemCd);
-  ymRange.set(canonicalCondKey("exmn_ym", "GTE"), addMonths(refYm, -6));
-  ymRange.set(canonicalCondKey("exmn_ym", "LTE"), refYm);
-
-  const plan = [
-    ["trend", datedEq, true],
-    ["change", datedEq, true],
-    ["daily", datedRange, true],
-    ["region", datedRange, true],
-    ["wholesale", periodRange, true],
-    ["retail", periodRange, true],
-    ["yearmonth", ymRange, true]
-  ];
-
-  for (const [target, params, widen] of plan) {
-    const core = await runSmartCore(target, params, env, widen);
-    results[target] = compactSmartResult(core, 5);
+    // v0.7.1의 fail-fast 원칙은 유지: 실제 upstream 일시 장애가 재시도 후에도 지속될 때만 503.
+    if (!core.ok && core.transient) {
+      return json({
+        ok: false,
+        version: WORKER_VERSION,
+        error: core.error,
+        userMessage: "공공 API가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해 주십시오.",
+        mode: "item-overview-endpoint-independent-latest",
+        item: { categoryCd, itemCd, itemNm },
+        diagnosticId: core.diagnosticId || "",
+        upstreamStatus: core.upstreamStatus || 0,
+        upstreamAttempts: core.upstreamAttempts || 0,
+        subrequestsUsed: budget.used,
+        subrequestBudget: budget.max,
+        partialResults: results
+      }, 503, { ...corsHeaders, "Cache-Control": "no-store" });
+    }
   }
 
   const entries = Object.entries(results);
-  const availableCount = entries.filter(([,v]) => v.rowCount > 0).length;
-  const errorCount = entries.filter(([,v]) => !v.ok).length;
+  const availableCount = entries.filter(([,v]) => v.status === "available").length;
+  const emptyCount = entries.filter(([,v]) => v.status === "empty").length;
+  const unconfirmedCount = entries.filter(([,v]) => v.status === "unconfirmed").length;
+  const errorCount = entries.filter(([,v]) => v.status === "error").length;
+  const latestDates = Object.fromEntries(entries.map(([k,v]) => [k, v.latestDate || ""]));
 
   return json({
     ok: true,
     version: WORKER_VERSION,
-    mode: "item-overview",
+    mode: "item-overview-endpoint-independent-latest",
     item: { categoryCd, itemCd, itemNm },
-    referenceDate,
+    latestDates,
+    // 구형 프론트 호환용. 다른 Endpoint의 조회 기준으로는 절대 사용하지 않는다.
+    referenceDate: results.recent?.latestDate || "",
+    referenceDateScope: "recent-only-backward-compatibility",
     availableCount,
-    endpointCount: entries.length,
+    emptyCount,
+    unconfirmedCount,
     errorCount,
+    endpointCount: entries.length,
+    subrequestsUsed: budget.used,
+    subrequestBudget: budget.max,
+    itemOverviewDayEqProbeLimit: ITEM_OVERVIEW_DAY_EQ_PROBE_LIMIT,
     results,
     notes: [
+      "각 가격 Endpoint는 자기 자료의 최신 실제 날짜/월을 독립적으로 탐색합니다.",
+      "/recent의 날짜는 다른 Endpoint의 공통 기준일로 사용하지 않습니다.",
       "품목코드는 모든 가격 Endpoint에서 고정합니다.",
+      "자료 있음·확정 0건·미확인·API 오류를 서로 구분합니다.",
+      "통합조회에서 trend/change는 Endpoint당 탐색량을 제한하며, 제한 내에서 자료를 못 찾으면 0건이 아니라 미확인으로 표시합니다.",
       "어기·비어기는 검색 차단조건으로 사용하지 않습니다.",
-      "단위·규격은 실제 API 응답값으로만 표시합니다.",
       "경매·온라인은 가격 API와 코드체계가 달라 프론트엔드에서 별도 자동탐색합니다."
     ]
   }, 200, { ...corsHeaders, "Cache-Control": "no-store" });
@@ -572,7 +1035,14 @@ export default {
         ok: true,
         service: "KAFV Fish Price API Gateway",
         version: WORKER_VERSION,
-        searchMode: "item-overview+wide-first-fallback",
+        searchMode: "endpoint-independent-latest-date + item-overview + wide-first-fallback",
+        resilience: {
+          upstreamTimeoutMs: UPSTREAM_TIMEOUT_MS,
+          upstreamMaxAttempts: UPSTREAM_MAX_ATTEMPTS,
+          transientStatuses: [...TRANSIENT_UPSTREAM_STATUS],
+          itemOverviewSubrequestBudget: ITEM_OVERVIEW_SUBREQUEST_BUDGET,
+          itemOverviewDayEqProbeLimit: ITEM_OVERVIEW_DAY_EQ_PROBE_LIMIT
+        },
         allowedOrigins: allowedOrigins(env),
         fallbackKeyConfigured: configured(env, "DATA_GO_KR_API_KEY"),
         storedOtherKeys: {
@@ -635,29 +1105,46 @@ export default {
       }, 500, getCorsHeaders(request, env));
     }
 
-    const upstream = new URL(BASE + route.path);
-    passParams(url, upstream);
-    upstream.searchParams.set("serviceKey", serviceKey);
+    const params = new URLSearchParams();
+    for (const [key, value] of url.searchParams.entries()) {
+      if (key !== "serviceKey") params.append(key, value);
+    }
 
     try {
-      const response = await fetch(upstream.toString(), {
-        method: "GET",
-        headers: { "Accept": "application/json" }
-      });
-      const body = await response.text();
-      return new Response(body, {
+      const result = await fetchUpstream(route, params, serviceKey);
+      const response = result.response;
+      if (!response.ok && retryableStatus(response.status)) {
+        return json({
+          error: "Upstream API temporarily unavailable",
+          userMessage: "공공 API가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해 주십시오.",
+          upstreamStatus: response.status,
+          diagnosticId: result.meta?.diagnosticId || "",
+          upstreamAttempts: result.meta?.attempts || 1
+        }, 503, {
+          ...getCorsHeaders(request, env),
+          "Cache-Control": "no-store",
+          "X-KAFV-Worker-Version": WORKER_VERSION
+        });
+      }
+      return new Response(result.text, {
         status: response.status,
         headers: {
           "Content-Type": response.headers.get("Content-Type") || "application/json; charset=utf-8",
           ...getCorsHeaders(request, env),
-          "Cache-Control": "no-store"
+          "Cache-Control": "no-store",
+          "X-KAFV-Worker-Version": WORKER_VERSION,
+          "X-KAFV-Upstream-Attempts": String(result.meta?.attempts || 1),
+          "X-KAFV-Diagnostic-Id": result.meta?.diagnosticId || ""
         }
       });
     } catch (error) {
       return json({
         error: "Upstream fetch failed",
-        message: String(error?.message || error)
-      }, 502, getCorsHeaders(request, env));
+        userMessage: "공공 API가 일시적으로 응답하지 않습니다. 잠시 후 다시 시도해 주십시오.",
+        message: String(error?.message || error),
+        diagnosticId: error?.diagnosticId || "",
+        attempts: error?.attempts || 0
+      }, 503, getCorsHeaders(request, env));
     }
   }
 };
