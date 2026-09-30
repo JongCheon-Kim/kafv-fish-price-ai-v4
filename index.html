@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#FEE500">
+<meta name="theme-color" content="#0A79C9">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -21,7 +21,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 .phone{width:min(390px,100%);height:min(830px,calc(100vh - 32px));background:var(--bg);border-radius:44px;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto auto;position:relative;border:1px solid rgba(0,0,0,.08);box-shadow:0 18px 55px rgba(22,40,54,.20)}
 .header{background:#fff;min-height:64px;display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line);z-index:5}
 .logo{width:42px;height:42px;border-radius:13px;background:var(--yellow);display:grid;place-items:center;font-size:23px;flex:0 0 auto}
-.brand{flex:1;min-width:0}.title{font-weight:900;font-size:15px;white-space:nowrap}
+.brand{flex:1;min-width:0}.title{font-weight:900;font-size:15px;white-space:nowrap}.sub{font-size:10.5px;color:var(--muted);margin-top:3px;white-space:nowrap}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#2fb344;margin-right:5px}
 .hbtn{width:32px;height:32px;border:0;border-radius:10px;background:#f4f6f8;font-weight:800;flex:0 0 auto}
 .chat{overflow:auto;padding:14px 12px 18px}.row{display:flex;margin:8px 0}.row.bot{justify-content:flex-start}.row.user{justify-content:flex-end}
 .bubble{max-width:90%;padding:10px 12px;border-radius:15px;font-size:13px;line-height:1.55;box-shadow:0 1px 1px rgba(0,0,0,.05)}.bot .bubble{background:#fff;border-top-left-radius:4px}.user .bubble{background:var(--yellow);border-top-right-radius:4px}
@@ -46,43 +46,213 @@ button,input,select{font:inherit} button{cursor:pointer}
 .pick-count{position:sticky;top:0;z-index:2;background:#f7f9fb;border-bottom:1px solid #e4e9ed;padding:7px 8px;font-size:10px;font-weight:800;color:#53616d}
 .pick-list{min-height:46px;overflow-y:scroll!important}.pick-help{font-size:10px;color:#7a8792;padding:5px 2px 0}
 .main-search-wrap{position:relative;flex:1;min-width:0}.main-search-wrap>input{width:100%;padding-right:42px}.main-drop-btn{position:absolute;right:4px;top:4px;width:34px;height:32px;border:1px solid #d7b900;border-radius:10px;background:#fff5a8;font-size:15px;font-weight:900;z-index:3;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.08)}.main-drop-btn.open{background:#e6eaee}.main-suggest{display:none;position:absolute;left:0;right:0;bottom:calc(100% + 7px);z-index:16;background:#fff;border:1px solid #d7dee5;border-radius:14px;box-shadow:0 14px 34px rgba(0,0,0,.18);padding:7px}.main-suggest.on{display:block}.main-suggest-title{font-size:10px;font-weight:800;color:#71808d;padding:5px 7px}.main-suggest-list{max-height:300px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}.main-suggest-list::-webkit-scrollbar{width:12px}.main-suggest-list::-webkit-scrollbar-thumb{background:#b7c0c8;border-radius:999px;border:3px solid #fff}.main-suggest-item{width:100%;border:0;background:#fff;text-align:left;padding:9px 8px;border-bottom:1px solid #f0f2f4;min-height:40px}.main-suggest-item:hover,.main-suggest-item:focus{background:#fff4a3;outline:none}.main-suggest-item b{font-size:12px}.main-suggest-item small{display:block;color:#798691;font-size:10px;margin-top:2px}.main-suggest-section{position:sticky;top:0;z-index:2;background:#f6f8f9;border-bottom:1px solid #e4e8ec;padding:7px 8px;font-size:10px;font-weight:900;color:#596571}.main-suggest-item.group{background:#fffbe6}.main-suggest-item.group b{font-size:12.5px}.main-suggest-help{font-size:10px;color:#7a8792;padding:5px 7px 1px}
+
+.catalog-browse{display:grid;gap:8px}.catalog-browse-search{position:sticky;top:0;z-index:4;background:#fff;padding-bottom:4px}.catalog-browse-search input{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.catalog-browse-search{position:relative;z-index:8}
+.catalog-search-drop{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:40;background:#fff;border:1px solid #cfd9e1;border-radius:12px;box-shadow:0 12px 28px rgba(17,58,84,.18);overflow:hidden}
+.catalog-search-drop.on{display:block}
+.catalog-search-head{padding:8px 10px;background:#f3f5f7;border-bottom:1px solid #e1e6ea;font-size:10px;font-weight:900;color:#4f5f6b}
+.catalog-search-list{max-height:300px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
+.catalog-search-list::-webkit-scrollbar{width:12px}.catalog-search-list::-webkit-scrollbar-thumb{background:#aeb8c0;border-radius:999px;border:3px solid #fff}
+.catalog-search-item{width:100%;border:0;border-bottom:1px solid #edf0f2;background:#fff;text-align:left;padding:10px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer}
+.catalog-search-item:hover,.catalog-search-item:focus{background:#fff39a;outline:none}
+.catalog-search-item b{font-size:12px;color:#162f3f}.catalog-search-item small{font-size:9px;color:#758591;white-space:nowrap}
+.catalog-search-empty{padding:14px 11px;color:#74838e;font-size:10px}
+.catalog-browse-list{display:none;gap:6px;max-height:430px;overflow:auto;overscroll-behavior:contain;padding-right:2px;border:1px solid #cfe0eb;border-radius:12px;padding:6px;background:#fff;box-shadow:0 10px 24px rgba(17,58,84,.12)}.catalog-browse-list.on{display:grid}.catalog-choice{width:100%;border:1px solid #dce5eb;background:#fff;border-radius:12px;padding:10px 11px;text-align:left;display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:center}.catalog-choice:hover,.catalog-choice:focus{background:#eef8ff;border-color:#7fc4e9;outline:none}.catalog-choice b{font-size:12px}.catalog-choice small{font-size:9.5px;color:#71808b}.catalog-choice .code{grid-column:2;grid-row:1/3;color:#0b78b7;font-weight:800;font-size:9px}.catalog-section-title{font-size:11px;font-weight:900;color:#0b6698;background:#edf8fe;border-radius:10px;padding:7px 9px;position:sticky;top:0}.catalog-empty{padding:18px;text-align:center;color:#73808b;font-size:11px}.catalog-hover-preview{position:absolute;z-index:58;min-width:210px;max-width:260px;background:#fff;border:1px solid #cbdde8;border-radius:14px;box-shadow:0 14px 30px rgba(15,66,96,.22);padding:9px;display:none;pointer-events:none}.catalog-hover-preview.on{display:block}.catalog-hover-preview strong{display:block;font-size:11px;color:#0a689e;margin-bottom:6px}.catalog-hover-preview span{display:block;font-size:10px;line-height:1.45;padding:2px 0;color:#33434e}.catalog-hover-preview em{font-style:normal;color:#71808b;font-size:9px}.home-menu-grid button[data-catalog-preview]{position:relative}
 .result{border-top:1px solid #edf0f3;margin-top:7px;padding-top:7px}.kv{display:grid;grid-template-columns:84px 1fr;gap:3px 8px;font-size:12.5px}.kv b{color:#4f5b66}.price{font-size:21px;font-weight:900;margin:5px 0}.badge{display:inline-block;font-size:10px;font-weight:800;border-radius:999px;padding:3px 7px;background:#edf6ff;color:#245f91;margin-right:4px}.badge.warn{background:#fff2df;color:#955700}.badge.ok{background:#e5f5ec;color:#157347}.badge.dark{background:#eef0f2;color:#374151}
+.install-float{position:absolute;z-index:18;right:12px;top:76px;border:1px solid #d7b900;background:var(--yellow);color:#191919;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:900;box-shadow:0 5px 15px rgba(0,0,0,.18);touch-action:none;user-select:none}.install-float.dragging{opacity:.78;cursor:grabbing}.install-float.hidden{display:none}
 .camera-box{background:#111;border-radius:14px;overflow:hidden;min-height:210px;display:grid;place-items:center;position:relative}.camera-box video,.camera-box img{width:100%;max-height:300px;object-fit:contain;display:block}.camera-placeholder{color:#d1d5db;text-align:center;padding:28px 14px;font-size:12px;line-height:1.6}.camera-status{font-size:10.5px;padding:7px 9px;border-radius:9px;background:#f6f8f9;color:#596571;border:1px solid #e2e7eb}.camera-status.ok{background:#eaf8ef;color:var(--ok);border-color:#c8ead5}.camera-status.err{background:#fff0f0;color:var(--danger);border-color:#f5cccc}.camera-status.warn{background:#fff8e7;color:#8a5d00;border-color:#f4dfaa}.photo-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.photo-actions button{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 6px;font-size:11px;font-weight:800}.hidden-file{display:none}
 @media(max-width:520px){.stage{padding:0}.phone{width:100%;height:100vh;border-radius:0;border:0}.sheet{max-height:90%}}
-body.big .bubble{font-size:15px}body.big .menu strong{font-size:14px}body.big .field label{font-size:12px}
 
 .overview-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:9px 0 12px}.overview-stat{background:#f4f8fb;border:1px solid #dbe6ef;border-radius:12px;padding:8px 5px;text-align:center}.overview-stat b{display:block;font-size:16px}.overview-stat small{font-size:10px;color:#637381}.overview-section{border-top:1px solid #e6edf3;padding:10px 0}.overview-section:first-of-type{border-top:0}.overview-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}.overview-title strong{font-size:14px}.overview-title .badge{flex:0 0 auto}.overview-mini{background:#f8fafc;border:1px solid #e4eaf0;border-radius:11px;padding:8px 10px;margin:5px 0;font-size:12px;line-height:1.55}.overview-mini .kv{font-size:12px}.overview-empty{font-size:12px;color:#6b7280;padding:4px 0}.overview-note{font-size:11px;color:#617080;line-height:1.5;margin-top:7px}.overview-detail{border:0;background:#edf5ff;color:#0b5ed7;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;cursor:pointer}.overview-loading{display:flex;align-items:center;gap:7px;color:#5c6b78;font-size:12px}.overview-loading:before{content:"";width:12px;height:12px;border:2px solid #c9d3dc;border-top-color:#111;border-radius:50%;animation:ovspin .8s linear infinite}@keyframes ovspin{to{transform:rotate(360deg)}}
 
-/* KAFV brand intro v1 */
-.kafv-intro{position:fixed;inset:0;z-index:99999;background:#b9dcf5;display:flex;align-items:stretch;justify-content:center;opacity:1;visibility:visible;transition:opacity .42s ease,visibility .42s ease;overflow:hidden}
-.kafv-intro.hide{opacity:0;visibility:hidden;pointer-events:none}
-.kafv-intro img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
-.kafv-intro-skip{position:absolute;right:calc(14px + env(safe-area-inset-right));top:calc(14px + env(safe-area-inset-top));border:1px solid rgba(255,255,255,.75);background:rgba(0,51,102,.38);color:#fff;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800;backdrop-filter:blur(4px)}
-.logo{overflow:hidden;background:#fff;padding:0}
-.logo img{width:100%;height:100%;display:block;object-fit:cover}
-@media(prefers-reduced-motion:reduce){.kafv-intro{transition:none}}
+/* ===== v0.20 Visual Card UI prototype: 수산직불제 UX 계보 적용 ===== */
+:root{--blue:#0a79c9;--blue2:#13a7dc;--navy:#123b56;--sky:#eef8ff;--card:#ffffff;--soft:#f7fbfe}
+.stage{padding:10px;background:linear-gradient(180deg,#eef7fb 0%,#e8f1f6 100%)}
+.phone{height:min(840px,calc(100vh - 20px));background:#f4f9fc;border-radius:42px;grid-template-rows:auto 1fr auto;box-shadow:0 20px 60px rgba(18,59,86,.20)}
+.header{min-height:72px;padding:12px 14px;border-bottom:0;box-shadow:0 1px 0 rgba(16,71,105,.08)}
+.logo{background:#e7f5ff;color:#0877c3;width:38px;height:38px;border-radius:11px;font-size:21px}
+.brand .title{font-size:16px;color:#103b58}.brand .sub{font-size:10px}.hbtn{background:#edf6fb;color:#0a6eac}
+.chat{padding:10px 11px 18px;background:#f4f9fc;scroll-behavior:smooth}
+.home-dashboard{display:grid;gap:10px;margin-bottom:10px}
+.hero-card-v18{position:relative;height:146px;border-radius:19px;overflow:hidden;background:linear-gradient(135deg,#0878c8,#18aee0);box-shadow:0 7px 18px rgba(8,120,200,.20)}
+.hero-card-v18 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 54%;filter:saturate(1.04)}
+.hero-card-v18:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,43,81,.64) 0%,rgba(2,56,100,.35) 45%,rgba(2,56,100,.06) 78%)}
+.hero-copy-v18{position:absolute;z-index:2;left:15px;top:15px;width:62%;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.20)}
+.hero-copy-v18 .pill{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.38);font-size:9px;font-weight:800}
+.hero-copy-v18 h1{font-size:19px;line-height:1.18;margin:9px 0 5px;letter-spacing:-.8px}.hero-copy-v18 p{font-size:10px;line-height:1.4;margin:0;color:#eaf8ff}
+.home-search-shell{position:relative}.home-search{height:44px;display:grid;grid-template-columns:30px 1fr 54px;background:#fff;border:1px solid #dce8f0;border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(18,59,86,.05)}
+.home-search span{display:grid;place-items:center;color:#7891a2}.home-search input{border:0;outline:0;min-width:0;padding:0 4px;font-size:11px}.home-search button{border:0;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;font-size:11px;font-weight:900}.home-search-suggest{position:absolute;left:0;right:0;top:48px;z-index:60;background:#fff;border:1px solid #cfe0eb;border-radius:14px;box-shadow:0 12px 28px rgba(17,58,84,.16);display:none;overflow:hidden}.home-search-suggest.open{display:block}.home-search-suggest-head{padding:9px 12px 7px;font-size:10px;font-weight:900;color:#557386;border-bottom:1px solid #edf3f6}.home-search-suggest-list{max-height:220px;overflow-y:auto;overscroll-behavior:contain;padding:5px}.home-search-option{width:100%;border:0;background:#fff;border-radius:10px;padding:10px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;color:#173d55;cursor:pointer}.home-search-option:hover,.home-search-option:focus{background:#eef8ff;outline:none}.home-search-option b{font-size:12px}.home-search-option small{font-size:9px;color:#7891a2}
+.home-title-row{display:flex;justify-content:space-between;align-items:center;padding:0 2px}.home-title-row h2{font-size:17px;margin:0;color:#173e57}.home-title-row small{font-size:9px;color:#0a79c9;font-weight:800}
+.home-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.home-menu-grid button{border:1px solid #d9e7f0;background:#fff;border-radius:14px;min-height:72px;padding:9px 4px;color:#173d55;box-shadow:0 3px 9px rgba(16,71,105,.05)}
+.home-menu-grid-15{gap:6px}.home-menu-grid-15 button{min-height:64px;padding:7px 3px}.home-menu-grid-15 span{font-size:19px;margin-bottom:5px}.home-menu-grid-15 b{font-size:9.5px}
+.home-menu-grid button:active{transform:translateY(1px)}.home-menu-grid span{display:block;font-size:21px;line-height:1;margin-bottom:7px}.home-menu-grid b{display:block;font-size:10px;letter-spacing:-.25px}
+.home-principle{display:grid;grid-template-columns:34px 1fr;gap:9px;align-items:start;background:#fff;border:1px solid #d9e7f0;border-radius:14px;padding:10px 11px}
+.home-principle .shield{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:#eaf6ff}.home-principle strong{font-size:11px;color:#183f58}.home-principle p{font-size:9.5px;line-height:1.45;margin:3px 0 0;color:#6b7f8d}
+.row:first-of-type{margin-top:10px}.bubble{border:1px solid rgba(19,75,108,.05)}
+.quick{grid-template-columns:repeat(4,1fr);gap:0;padding:6px 7px calc(6px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #dce6ec;box-shadow:0 -4px 16px rgba(20,64,90,.05)}
+.quick button{min-height:48px;border-radius:10px;box-shadow:none;background:transparent;color:#607888;font-size:9px;font-weight:800}.quick button span{font-size:17px;margin-bottom:3px}.quick button:hover,.quick button:focus{color:var(--blue);background:#eef8ff}
+.composer{display:none}
+.primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff}.main-drop-btn{background:#e9f6ff;border-color:#acd9f4}.send{background:var(--blue);color:#fff}
+.sheet{border-radius:24px 24px 0 0}.menu{border-color:#d9e7f0;box-shadow:0 3px 9px rgba(16,71,105,.04)}
+.install-float{background:#0a79c9!important;color:#fff!important}
+
+.result-divider{display:flex;align-items:center;gap:9px;margin:2px 0 8px;padding:0 2px}.result-divider:before,.result-divider:after{content:"";height:1px;background:#a9cfe4;flex:1}.result-divider span{font-size:11px;font-weight:900;color:#176d9d;letter-spacing:-.2px;white-space:nowrap}
+.result-zone{background:#d9edf8;border:1px solid #b7d9eb;border-radius:18px;padding:10px 9px 12px;min-height:120px;box-shadow:inset 0 1px 0 rgba(255,255,255,.7);margin-bottom:4px}.result-zone-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:1px 3px 8px}.result-zone-head strong{font-size:12px;color:#0f5d88}.result-zone-actions{display:flex;align-items:center;gap:7px}.result-zone-head small{font-size:9px;color:#58839a}.result-reset-btn{border:1px solid #8fc6e2;background:#fff;color:#0a6fae;border-radius:999px;padding:5px 8px;font-size:9px;font-weight:900;line-height:1;cursor:pointer;box-shadow:0 1px 3px rgba(16,71,105,.05)}.result-reset-btn:hover{background:#eef8ff}.result-reset-btn:active{transform:translateY(1px)}.result-zone-empty{background:rgba(255,255,255,.72);border:1px dashed #a7cada;border-radius:13px;padding:14px 12px;text-align:center;color:#55788b;font-size:10px;line-height:1.5}.result-zone .row{margin:7px 0}.result-zone .bot .bubble{background:#fff;border:1px solid rgba(10,121,201,.08);box-shadow:0 2px 8px rgba(19,75,108,.05)}.result-zone .user .bubble{background:var(--yellow);border:1px solid #edd500}.result-zone .bubble{max-width:94%}
+@media(max-height:720px){.hero-card-v18{height:124px}.home-menu-grid button{min-height:64px}.home-dashboard{gap:8px}}
+
+
+/* v0.26 fullscreen result view */
+.result-divider,.result-zone{display:none!important}
+.full-result{position:absolute;inset:0;background:#eef7fc;z-index:60;display:none;grid-template-rows:auto 1fr auto;overflow:hidden}.full-result.on{display:grid}
+.full-result-head{height:62px;background:linear-gradient(135deg,#0878c8,#19aee0);color:#fff;display:flex;align-items:center;gap:8px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,79,130,.20)}
+.full-result-head h2{margin:0;flex:1;font-size:16px;font-weight:900}.full-result-head small{display:block;font-size:9px;opacity:.86;font-weight:500;margin-top:2px}.full-result-close,.full-result-back{width:36px;height:36px;border:0;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-size:20px;font-weight:900}
+.full-result-body{overflow:auto;padding:14px 12px 24px;overscroll-behavior:contain}.full-result-body .row{margin:8px 0}.full-result-body .bubble{max-width:100%;width:100%;border-radius:16px}.full-result-body .bot .bubble{background:#fff;border:1px solid #cce3f0}.full-result-body .user .bubble{background:#d9f0ff;border:1px solid #a9d5ef}.full-result-empty{background:#fff;border:1px dashed #9ecde7;border-radius:16px;padding:28px 18px;text-align:center;color:#527789;font-size:12px;line-height:1.6}.full-result-foot{display:flex;gap:8px;background:#fff;border-top:1px solid #d5e1e8;padding:9px 12px calc(9px + env(safe-area-inset-bottom))}.full-result-foot button{flex:1;border:0;border-radius:13px;padding:11px;font-weight:900}.full-result-home{background:#e8f4fb;color:#0a689e}.full-result-reset{background:#0a8fd3;color:#fff}
+
+
+/* v0.26 refined: 상세 선택화면도 모바일 전체화면 */
+.sheet-bg{align-items:stretch!important;background:#eef7fc!important;z-index:70!important}
+.sheet-bg.on{display:flex!important}
+.sheet{height:100%!important;max-height:none!important;border-radius:0!important;padding:0 14px calc(18px + env(safe-area-inset-bottom))!important;background:#f7fbfe!important;overflow:auto!important}
+.sheet>.grab{position:sticky;top:0;z-index:4;margin:0 -14px 0;height:10px;width:auto;border-radius:0;background:linear-gradient(135deg,#0878c8,#19aee0)}
+.sheet-head{position:sticky;top:10px;z-index:5;margin:0 -14px 14px;padding:12px 14px;background:linear-gradient(135deg,#0878c8,#19aee0);color:#fff;box-shadow:0 3px 12px rgba(0,79,130,.18)}
+.sheet-head h2{font-size:17px;color:#fff}.sheet-head .backx{background:rgba(255,255,255,.18);color:#fff}
+.sheet .form,.sheet .catalog-browse,.sheet .menu-grid{max-width:100%;padding-bottom:20px}
+.sheet .field input,.sheet .field select,.sheet .pick-button,.sheet .catalog-browse-search input{min-height:46px;font-size:13px}
+.sheet .primary{min-height:48px;font-size:14px}
+.catalog-search-drop{max-height:calc(100vh - 235px)!important}.catalog-search-list{max-height:calc(100vh - 285px)!important}
+
+/* 4주 추세·등락 전체화면 그래프 */
+.trend-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;background:linear-gradient(135deg,#0a79c9,#18aee0);color:#fff;border-radius:18px;padding:15px;margin:6px 0 12px}.trend-hero small{font-size:9px;opacity:.82}.trend-hero h3{font-size:20px;margin:2px 0}.trend-hero p{font-size:10px;margin:0;opacity:.88}.trend-current{text-align:right}.trend-current b{display:block;font-size:18px;margin-top:2px}
+.trend-chart-card{background:#fff;border:1px solid #cfe4ef;border-radius:18px;padding:12px;margin-bottom:10px;box-shadow:0 3px 12px rgba(18,59,86,.05)}.trend-chart-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}.trend-chart-title b{font-size:13px;color:#173d55}.trend-chart-title span{font-size:9px;color:#0a79c9;font-weight:800}.trend-chart-card svg{display:block;width:100%;height:auto;overflow:visible}
+.trend-rate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.trend-rate{background:#fff;border:1px solid #d7e7f0;border-radius:14px;padding:11px;display:flex;justify-content:space-between;align-items:center}.trend-rate span{font-size:10px;color:#657d8d}.trend-rate b{font-size:13px}.trend-rate b.up{color:#d33}.trend-rate b.down{color:#1676c4}.trend-rate b.flat{color:#667}
+
+
+
+/* v0.26 접근성: 앱 전체 글자 크기 3단계 */
+#fontBtn{transition:background .15s,color .15s,transform .15s;white-space:nowrap;font-size:15px}
+body.font-large #fontBtn,body.font-xlarge #fontBtn{background:#dff2ff;color:#086fae}
+body.font-xlarge #fontBtn{box-shadow:0 0 0 2px #9bd4f2 inset}
+
+/* 1단계: 크게 */
+body.font-large .title{font-size:17px} body.font-large .sub{font-size:11.5px}
+body.font-large .hero-copy-v18 .pill{font-size:10.5px} body.font-large .hero-copy-v18 h1{font-size:19px} body.font-large .hero-copy-v18 p{font-size:10.5px}
+body.font-large .home-search input{font-size:12.5px} body.font-large .home-search button{font-size:12px}
+body.font-large .home-title-row h2{font-size:18px} body.font-large .home-title-row small{font-size:10px}
+body.font-large .home-menu-grid-15 b{font-size:10.8px} body.font-large .home-menu-grid-15 button{min-height:68px}
+body.font-large .quick button{font-size:10px}
+body.font-large .sheet-head h2{font-size:19px}
+body.font-large .hint,body.font-large .fixed-stage{font-size:11.5px}
+body.font-large .field label{font-size:12px} body.font-large .field input,body.font-large .field select,body.font-large .catalog-browse-search input{font-size:14px}
+body.font-large .menu strong{font-size:14px} body.font-large .menu small{font-size:11.5px}
+body.font-large .pick-count,body.font-large .pick-opt b,body.font-large .catalog-search-head,body.font-large .catalog-search-item b,body.font-large .catalog-choice b{font-size:12.8px}
+body.font-large .pick-opt small,body.font-large .catalog-search-item small,body.font-large .catalog-choice small{font-size:10.5px}
+body.font-large .primary,body.font-large .secondary{font-size:14.5px}
+body.font-large .bubble{font-size:14.5px} body.font-large .bubble h3{font-size:15.5px} body.font-large .source{font-size:11.5px}
+body.font-large .full-result-head h2{font-size:18px} body.font-large .full-result-head small{font-size:10px}
+body.font-large .full-result-empty{font-size:13px} body.font-large .full-result-foot button{font-size:14px}
+body.font-large .trend-hero small{font-size:10px} body.font-large .trend-hero h3{font-size:22px} body.font-large .trend-hero p{font-size:11px}
+body.font-large .trend-chart-title b{font-size:14px} body.font-large .trend-chart-title span{font-size:10px}
+body.font-large .trend-rate span{font-size:11px} body.font-large .trend-rate b{font-size:14px}
+body.font-large .kv{font-size:13px}
+
+/* 2단계: 더 크게 */
+body.font-xlarge .title{font-size:18.5px} body.font-xlarge .sub{font-size:12.5px}
+body.font-xlarge .hero-copy-v18 .pill{font-size:11.5px} body.font-xlarge .hero-copy-v18 h1{font-size:21px} body.font-xlarge .hero-copy-v18 p{font-size:11.5px}
+body.font-xlarge .home-search input{font-size:14px} body.font-xlarge .home-search button{font-size:13px}
+body.font-xlarge .home-title-row h2{font-size:19.5px} body.font-xlarge .home-title-row small{font-size:11px}
+body.font-xlarge .home-menu-grid-15 b{font-size:11.7px} body.font-xlarge .home-menu-grid-15 button{min-height:72px}
+body.font-xlarge .quick button{font-size:11px}
+body.font-xlarge .sheet-head h2{font-size:20.5px}
+body.font-xlarge .hint,body.font-xlarge .fixed-stage{font-size:12.5px}
+body.font-xlarge .field label{font-size:13px} body.font-xlarge .field input,body.font-xlarge .field select,body.font-xlarge .catalog-browse-search input{font-size:15px}
+body.font-xlarge .menu strong{font-size:15px} body.font-xlarge .menu small{font-size:12.5px}
+body.font-xlarge .pick-count,body.font-xlarge .pick-opt b,body.font-xlarge .catalog-search-head,body.font-xlarge .catalog-search-item b,body.font-xlarge .catalog-choice b{font-size:13.8px}
+body.font-xlarge .pick-opt small,body.font-xlarge .catalog-search-item small,body.font-xlarge .catalog-choice small{font-size:11.5px}
+body.font-xlarge .primary,body.font-xlarge .secondary{font-size:15.5px}
+body.font-xlarge .bubble{font-size:15.5px} body.font-xlarge .bubble h3{font-size:16.5px} body.font-xlarge .source{font-size:12px}
+body.font-xlarge .full-result-head h2{font-size:19px} body.font-xlarge .full-result-head small{font-size:10.8px}
+body.font-xlarge .full-result-empty{font-size:14px} body.font-xlarge .full-result-foot button{font-size:15px}
+body.font-xlarge .trend-hero small{font-size:11px} body.font-xlarge .trend-hero h3{font-size:24px} body.font-xlarge .trend-hero p{font-size:12px}
+body.font-xlarge .trend-chart-title b{font-size:15px} body.font-xlarge .trend-chart-title span{font-size:11px}
+body.font-xlarge .trend-rate span{font-size:12px} body.font-xlarge .trend-rate b{font-size:15px}
+body.font-xlarge .kv{font-size:14px}
+
+/* 큰 글자에서도 카드/목록이 잘리지 않도록 */
+body.font-large .sheet .field input,body.font-large .sheet .field select,body.font-xlarge .sheet .field input,body.font-xlarge .sheet .field select{height:auto;min-height:48px}
+body.font-xlarge .menu{min-height:88px}
+
 </style>
 </head>
 <body>
-<div class="kafv-intro" id="kafvIntro" role="dialog" aria-label="KAFV 수산물 가격정보 AI 시작 화면">
-  <img src="kafv-fish-price-ai-intro.png" alt="KAFV 수산물 가격정보 AI - 수산물 가격 정보를 내손에, 한국AI어촌가치연구소 KAFV, 제작자 김종천">
-  <button type="button" class="kafv-intro-skip" id="kafvIntroSkip" aria-label="시작 화면 건너뛰기">건너뛰기</button>
-</div>
 <div class="stage"><main class="phone" id="phone">
 <header class="header">
-  <div class="logo"><img src="kafv-fish-price-ai-icon-192.png" alt="KAFV"></div>
-  <div class="brand"><div class="title">KAFV 수산물 가격정보 AI</div></div>
-  <button class="hbtn" id="fontBtn" title="글자 크기">가</button>
+  <div class="logo">🐟</div>
+  <div class="brand"><div class="title">KAFV 수산물 가격정보 AI</div><div class="sub"><span class="dot"></span>aT 공공데이터 연계 · v0.26</div></div>
+  <button class="hbtn" id="fontBtn" type="button" title="글자 크기: 기본" aria-label="글자 크기 변경">가</button>
   <button class="hbtn" id="settingsBtn" title="설정">⚙</button>
 </header>
-<section class="chat" id="chat"></section>
-<nav class="quick">
+<section class="chat" id="chat">
+  <section class="home-dashboard" id="homeDashboard">
+    <article class="hero-card-v18">
+      <img src="kafv-fish-price-ai-hero.png" alt="KAFV 수산물 가격정보 AI">
+      <div class="hero-copy-v18">
+        <span class="pill">수산물 가격정보 AI</span>
+        <h1>오늘 수산물 가격,<br>한눈에 확인하세요.</h1>
+        <p>가격 · 추세 · 지역 · 시장 · 경매 · 거래를 실제 공공데이터로 확인합니다.</p>
+      </div>
+    </article>
+    <div class="home-search-shell" id="homeSearchShell">
+      <form class="home-search" id="homeSearchForm">
+        <span>⌕</span>
+        <input id="homeSearchInput" autocomplete="off" placeholder="품목·기능·지역·시장·경매 조건을 검색하세요">
+        <button type="submit">조회</button>
+      </form>
+      <div class="home-search-suggest" id="homeSearchSuggest" aria-hidden="true">
+        <div class="home-search-suggest-head">수산물·조회기능 통합 탐색</div>
+        <div class="home-search-suggest-list" id="homeSearchSuggestList"><div class="pick-empty">목록 불러오는 중...</div></div>
+      </div>
+    </div>
+    <div class="home-title-row"><h2>바로 확인</h2><small>주요 기능</small></div>
+    <div class="home-menu-grid home-menu-grid-15">
+      <button type="button" data-direct-menu="overview"><span>🐟</span><b>품목 통합조회</b></button>
+      <button type="button" data-direct-menu="recent"><span>₩</span><b>최근가격</b></button>
+      <button type="button" data-direct-menu="daily"><span>📅</span><b>일별가격</b></button>
+      <button type="button" data-direct-menu="trend"><span>📈</span><b>가격추세</b></button>
+      <button type="button" data-direct-menu="change"><span>↕️</span><b>등락정보</b></button>
+      <button type="button" data-direct-menu="ym"><span>📊</span><b>연월별 통계</b></button>
+      <button type="button" data-direct-menu="region"><span>📍</span><b>지역별 가격</b></button>
+      <button type="button" data-direct-menu="pwh"><span>🏬</span><b>기간 중도매</b></button>
+      <button type="button" data-direct-menu="prt"><span>🛍️</span><b>기간 소매</b></button>
+      <button type="button" data-direct-menu="auction"><span>🔨</span><b>실시간 경매</b></button>
+      <button type="button" data-direct-menu="online"><span>🛒</span><b>온라인 도매</b></button>
+      <button type="button" data-direct-menu="catalogGoods"><span>🐠</span><b>전체 품목</b></button>
+      <button type="button" data-direct-menu="catalogMarkets"><span>🏪</span><b>시장 정보</b></button>
+      <button type="button" data-direct-menu="trend4"><span>📉</span><b>4주 추세·등락</b></button>
+      <button type="button" data-direct-menu="usageGuide" data-catalog-preview="usageGuide"><span>❓</span><b>사용방법</b></button>
+    </div>
+    <div class="catalog-hover-preview" id="catalogHoverPreview"></div>
+
+  </section>
+  <div class="result-divider" aria-hidden="true"><span>조회 결과</span></div>
+  <section class="result-zone" id="resultZone" aria-live="polite">
+    <div class="result-zone-head"><strong>조회 결과</strong><div class="result-zone-actions"><small>선택한 기능의 결과가 표시됩니다</small><button type="button" id="resultResetBtn" class="result-reset-btn" title="조회 결과 지우기" aria-label="조회 결과 지우기">↻ 초기화</button></div></div>
+    <div class="result-zone-empty" id="resultZoneEmpty">위의 품목 또는 기능을 선택하면 결과가 이 창에 표시됩니다.</div>
+  </section>
+</section>
+<section class="full-result" id="fullResult" aria-live="polite">
+  <header class="full-result-head"><button type="button" class="full-result-back" id="fullResultBack" aria-label="뒤로가기">←</button><div><h2>조회 결과</h2><small>수산물 가격정보 AI · v0.26</small></div><button type="button" class="full-result-close" id="fullResultClose" aria-label="닫기">×</button></header>
+  <div class="full-result-body" id="fullResultBody"><div class="full-result-empty" id="fullResultEmpty">기능을 선택하고 조회하면 결과가 전체 화면에 표시됩니다.</div></div>
+  <footer class="full-result-foot"><button type="button" class="full-result-home" id="fullResultHome">기능 선택으로</button><button type="button" class="full-result-reset" id="fullResultReset">결과 초기화</button></footer>
+</section>
+<nav class="quick" aria-label="주요 메뉴">
   <button data-group="price"><span>₩</span>가격</button>
   <button data-group="trend"><span>📈</span>추세·등락</button>
   <button data-group="region"><span>📍</span>지역·시장</button>
   <button data-group="trade"><span>🔨</span>경매·거래</button>
 </nav>
-<form class="composer" id="composer">
+<form class="composer" id="composer" aria-hidden="true">
   <button class="toolbtn" id="cameraBtn" type="button" title="사진·카메라">📷</button>
   <button class="toolbtn" id="micBtn" type="button" title="음성 검색">🎤</button>
   <div class="main-search-wrap" id="mainSearchWrap">
@@ -96,35 +266,16 @@ body.big .bubble{font-size:15px}body.big .menu strong{font-size:14px}body.big .f
   </div>
   <button class="send" type="submit">➤</button>
 </form>
+<button id="installBtn" class="install-float" type="button">앱 설치</button>
 <div class="sheet-bg" id="sheetBg"><section class="sheet" id="sheet"></section></div>
 </main></div>
 <script>
-const KAFV_INTRO_SESSION_KEY="kafv_fish_price_intro_seen_v1";
-(function initKafvIntro(){
-  const intro=document.getElementById("kafvIntro");
-  const skip=document.getElementById("kafvIntroSkip");
-  if(!intro)return;
-  let seen=false;
-  try{seen=sessionStorage.getItem(KAFV_INTRO_SESSION_KEY)==="1"}catch(_){}
-  const closeIntro=()=>{
-    if(intro.classList.contains("hide"))return;
-    intro.classList.add("hide");
-    intro.setAttribute("aria-hidden","true");
-    try{sessionStorage.setItem(KAFV_INTRO_SESSION_KEY,"1")}catch(_){}
-    setTimeout(()=>intro.remove(),520);
-  };
-  if(seen){intro.remove();return;}
-  skip?.addEventListener("click",closeIntro);
-  intro.addEventListener("click",e=>{if(e.target===intro||e.target.tagName==="IMG")closeIntro()});
-  const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  setTimeout(closeIntro,reduce?700:1900);
-})();
 const API_BASE="https://kafv-fish-price-api.123kjc.workers.dev";
 const PRICE_CATEGORY="600";
 const DEFAULT_PRICE_ITEM={name:"고등어",code:"611"};
 const PRICE_CATALOG_STORAGE_KEY="kafv_price_item_catalog_v4_v017";
 const PRICE_FACET_STORAGE_KEY="kafv_price_unit_size_facets_v4_v017";
-const chat=document.getElementById("chat"),sheetBg=document.getElementById("sheetBg"),sheet=document.getElementById("sheet"),phone=document.getElementById("phone");
+const chat=document.getElementById("chat"),resultZone=document.getElementById("resultZone"),resultZoneEmpty=document.getElementById("resultZoneEmpty"),sheetBg=document.getElementById("sheetBg"),sheet=document.getElementById("sheet"),phone=document.getElementById("phone"),fullResult=document.getElementById("fullResult"),fullResultBody=document.getElementById("fullResultBody"),fullResultEmpty=document.getElementById("fullResultEmpty");
 const nav={group:null,menu:null,device:null,prefillItem:DEFAULT_PRICE_ITEM,prefillDetail:{item:"611",se:""},prefillAuction:{}};
 const cache={priceFish:null,priceRows:new Map(),smartRows:new Map(),stdGoods:null,stdMarkets:null,stdCorps:null,stdUnits:null,stdSizes:null,stdGrades:null,stdOrigins:null,stdPackagings:null,auctionRows:new Map(),onlineRows:null,mainUnits:null,mainSizes:null};
 const SEASON={고등어:{season:"9월 ~ 다음 해 2월",note:"주 어기 외에는 수입산·냉동품 등 대체 공급을 함께 확인해야 합니다."}};
@@ -154,7 +305,13 @@ function iso(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).p
 function d8(v){return String(v||iso()).replaceAll("-","")}
 function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return iso(d)}
 function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return iso(d)}
-function add(html,who="bot"){const r=document.createElement("div");r.className=`row ${who}`;r.innerHTML=`<div class="bubble">${html}</div>`;chat.appendChild(r);chat.scrollTop=chat.scrollHeight;return r}
+function openFullResult(){if(fullResult)fullResult.classList.add("on");}
+function closeFullResult(){if(fullResult)fullResult.classList.remove("on");}
+function add(html,who="bot"){openFullResult();if(fullResultEmpty)fullResultEmpty.style.display="none";const r=document.createElement("div");r.className=`row ${who}`;r.innerHTML=`<div class="bubble">${html}</div>`;(fullResultBody||resultZone||chat).appendChild(r);if(fullResultBody)fullResultBody.scrollTop=fullResultBody.scrollHeight;return r}
+function resetResultZone(){
+  const host=fullResultBody||resultZone;if(!host)return;host.querySelectorAll(":scope > .row").forEach(el=>el.remove());
+  if(fullResultEmpty){fullResultEmpty.style.display="block";fullResultEmpty.textContent="기능을 선택하고 조회하면 결과가 전체 화면에 표시됩니다.";}
+}
 function normalize(raw){let x=raw;if(typeof x==="string"){try{x=JSON.parse(x)}catch{}}let b=x?.response?.body??x?.body??x;if(typeof b==="string"){try{b=JSON.parse(b)}catch{}}return b}
 function itemsOf(raw){const b=normalize(raw);let it=b?.items?.item??b?.item??b?.items??[];if(it&&!Array.isArray(it))it=[it];return {body:b,items:Array.isArray(it)?it:[]}}
 function firstField(r,keys){for(const k of keys){const v=r?.[k];if(v!==undefined&&v!==null&&String(v).trim()!=="")return String(v).trim()}return ""}
@@ -354,7 +511,7 @@ function priceParamsBase(extra={}){const d=currentDetail();const p={"ctgry_cd::E
 async function rowsForFacet(mode){
   const d=currentDetail();let path="/api/recent",extra={},key="";
   if(mode==="recent"||mode==="trend"||mode==="change"){path="/api/recent"}
-  if(mode==="daily"||mode==="region"){path="/api/daily";const dt=d8(getVal("fDate")||iso());extra={"exmn_ymd::GTE":dt,"exmn_ymd::LTE":dt}}
+  if(mode==="daily"||mode==="region"){path="/api/daily";const dt=d8(getVal("fDate")||yesterday());extra={"exmn_ymd::GTE":dt,"exmn_ymd::LTE":dt}}
   if(mode==="pwh"||mode==="prt"){path=mode==="pwh"?"/api/wholesale":"/api/retail";extra={"exmn_ymd::GTE":d8(getVal("fStart")),"exmn_ymd::LTE":d8(getVal("fEnd"))}}
   if(mode==="ym"){path="/api/yearmonth";extra={"exmn_ym::GTE":getVal("fStartYm").replace("-",""),"exmn_ym::LTE":getVal("fEndYm").replace("-","")}}
   const p=priceParamsBase(extra);key=`${mode}|${JSON.stringify(p)}`;return priceRows(path,p,key)
@@ -510,8 +667,192 @@ const groupName={price:"가격",trend:"추세·등락",region:"지역·시장",t
 function openGroup(g){nav.group=g;nav.menu=null;nav.device=null;setSheet(`${head(groupName[g])}<div class="menu-grid">${menus[g].map(m=>`<button class="menu" data-menu="${m[2]}"><strong>${m[0]}</strong><small>${m[1]}</small></button>`).join("")}</div>`);sheet.querySelectorAll("[data-menu]").forEach(b=>b.onclick=()=>openMenu(b.dataset.menu))}
 document.querySelectorAll("[data-group]").forEach(b=>b.onclick=()=>openGroup(b.dataset.group));
 
+const directMenuGroup={overview:"price",recent:"price",daily:"price",pwh:"price",prt:"price",trend:"trend",change:"trend",region:"region",ym:"trend",auction:"trade",online:"trade",catalogGoods:"info",catalogMarkets:"info",trend4:"trend",usageGuide:"info"};
+document.querySelectorAll("[data-direct-menu]").forEach(b=>b.onclick=()=>{const m=b.dataset.directMenu;nav.group=directMenuGroup[m]||"price";openMenu(m)});
+
+document.querySelector("[data-home-settings]")?.addEventListener("click",()=>document.getElementById("settingsBtn").click());
+const homeSearchForm=document.getElementById("homeSearchForm"),homeSearchInput=document.getElementById("homeSearchInput"),homeSearchShell=document.getElementById("homeSearchShell"),homeSearchSuggest=document.getElementById("homeSearchSuggest"),homeSearchSuggestList=document.getElementById("homeSearchSuggestList");
+function closeHomeSearchSuggest(){homeSearchSuggest?.classList.remove("open");homeSearchSuggest?.setAttribute("aria-hidden","true")}
+function openHomeSearchSuggest(){homeSearchSuggest?.classList.add("open");homeSearchSuggest?.setAttribute("aria-hidden","false");renderHomeSearchSuggest(homeSearchInput?.value||"")}
+function homeSearchGroups(){return [
+  ["가격·추세·지역·경매 기능",["group","intent"]],
+  ["가격 · 품목명",["item"]],
+  ["가격 · 유통단계",["stage"]],
+  ["가격 · 품종/상태",["variety"]],
+  ["가격 · 등급",["grade"]],
+  ["가격 · 지역",["regionCode"]],
+  ["가격 · 시장",["marketCode"]],
+  ["경매 · 도매시장",["auctionMarket"]],
+  ["경매 · 법인",["auctionCorp"]],
+  ["경매 · 상품 대분류",["auctionLarge"]],
+  ["경매 · 상품 중분류",["auctionMid"]],
+  ["경매 · 상품 소분류",["auctionSmall"]]
+]}
+function homeRowButton(r,idx){
+  const attrs=[`data-home-row="${idx}"`];
+  return `<button type="button" class="home-search-option" ${attrs.join(" ")}><b>${esc(r.title)}</b><small>${esc(r.desc||"")}</small></button>`;
+}
+function renderHomeSearchSuggest(q=""){
+  if(!homeSearchSuggestList)return;
+  const rows=mainRows(q,false);
+  window.__homeSearchRows=rows;
+  let html="";
+  for(const [title,kinds] of homeSearchGroups()){
+    const section=rows.map((r,i)=>({r,i})).filter(x=>kinds.includes(x.r.kind));
+    if(!section.length)continue;
+    html+=`<div class="main-suggest-section">${esc(title)} (${section.length})</div>`;
+    html+=section.map(x=>homeRowButton(x.r,x.i)).join("");
+  }
+  homeSearchSuggestList.innerHTML=html||`<div class="pick-empty">검색 결과가 없습니다.</div>`;
+  homeSearchSuggestList.querySelectorAll("[data-home-row]").forEach(btn=>btn.addEventListener("click",()=>{
+    const r=(window.__homeSearchRows||[])[Number(btn.dataset.homeRow)];if(!r)return;
+    handleHomeSearchRow(r);
+  }));
+}
+function handleHomeSearchRow(r){
+  const kind=r.kind,code=r.code||"";
+  if(kind==="group"){closeHomeSearchSuggest();openGroup(r.group);return}
+  if(kind==="intent"){
+    const intent=INTENTS[Number(r.intentIndex)];if(!intent)return;
+    nav.prefillItem=mainSelectedItem||DEFAULT_PRICE_ITEM;closeHomeSearchSuggest();nav.group=intent.group;openMenu(intent.menu);return;
+  }
+  if(kind==="item"){
+    const item=currentCatalog().find(f=>String(f.code)===String(code));if(!item)return;
+    mainSelectedItem=item;nav.prefillItem=item;nav.prefillDetail={item:item.code,se:nav.prefillDetail?.se||"02"};
+    homeSearchInput.value=item.name;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="stage"){
+    nav.prefillDetail={...(nav.prefillDetail||{}),item:nav.prefillDetail?.item||mainSelectedItem.code,se:code};
+    homeSearchInput.value=`${mainSelectedItem.name} ${r.title||""}`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="variety"){
+    const item=r.item||mainSelectedItem.code,itemName=ITEM_NAME_BY_CODE.get(item)||mainSelectedItem.name;
+    mainSelectedItem={code:item,name:itemName};nav.prefillItem=mainSelectedItem;
+    nav.prefillDetail={...(nav.prefillDetail||{}),item,se:nav.prefillDetail?.se||"02",vr:code,gr:"",unit:"",size:""};
+    homeSearchInput.value=r.title||itemName;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="grade"){
+    const item=r.item||mainSelectedItem.code,vr=r.vr||"",itemName=ITEM_NAME_BY_CODE.get(item)||mainSelectedItem.name;
+    mainSelectedItem={code:item,name:itemName};nav.prefillItem=mainSelectedItem;
+    nav.prefillDetail={...(nav.prefillDetail||{}),item,se:nav.prefillDetail?.se||"02",vr,gr:code,unit:"",size:""};
+    homeSearchInput.value=r.title||itemName;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="regionCode"){
+    nav.prefillDetail={...(nav.prefillDetail||{}),sgg:code,market:""};homeSearchInput.value=`${codebookRegionName(code)} 가격`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="marketCode"){
+    nav.prefillDetail={...(nav.prefillDetail||{}),sgg:r.region||"",market:code};homeSearchInput.value=`${codebookMarketName(code)} 가격`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="auctionMarket"){
+    nav.prefillAuction={...(nav.prefillAuction||{}),market:code,corp:""};const x=AUCTION_CODEBOOK.markets.find(v=>v.code===code);homeSearchInput.value=`${x?.name||code} 실시간 경매`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="auctionCorp"){
+    nav.prefillAuction={...(nav.prefillAuction||{}),market:r.market||nav.prefillAuction?.market||"",corp:code};const x=AUCTION_CODEBOOK.corps.find(v=>v.code===code);homeSearchInput.value=`${x?.name||code} 실시간 경매`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="auctionLarge"){
+    nav.prefillAuction={...(nav.prefillAuction||{}),large:code,mid:"",small:""};const x=AUCTION_CODEBOOK.large.find(v=>v.code===code);homeSearchInput.value=`${x?.name||code} 실시간 경매`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="auctionMid"){
+    nav.prefillAuction={...(nav.prefillAuction||{}),large:r.large||"",mid:code,small:""};homeSearchInput.value=`${r.title||code} 실시간 경매`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+  if(kind==="auctionSmall"){
+    nav.prefillAuction={...(nav.prefillAuction||{}),large:r.large||"",mid:r.mid||"",small:code};homeSearchInput.value=`${r.title||code} 실시간 경매`;renderHomeSearchSuggest(homeSearchInput.value);return;
+  }
+}
+homeSearchInput?.addEventListener("focus",openHomeSearchSuggest);
+homeSearchInput?.addEventListener("input",()=>{openHomeSearchSuggest();renderHomeSearchSuggest(homeSearchInput.value)});
+homeSearchShell?.addEventListener("mouseenter",()=>{if(document.activeElement===homeSearchInput||!homeSearchInput.value)openHomeSearchSuggest()});
+homeSearchShell?.addEventListener("mouseleave",()=>{setTimeout(()=>{if(!homeSearchShell.matches(":hover")&&document.activeElement!==homeSearchInput)closeHomeSearchSuggest()},120)});
+document.addEventListener("click",e=>{if(homeSearchShell&&!homeSearchShell.contains(e.target))closeHomeSearchSuggest()});
+homeSearchForm?.addEventListener("submit",e=>{e.preventDefault();const q=homeSearchInput.value.trim();if(!q){openHomeSearchSuggest();return;}mainInput.value=q;closeHomeSearchSuggest();document.getElementById("composer").requestSubmit();});
+
+
+function catalogFields(kind){
+  if(kind==="catalogGoods")return {title:"전체 품목",sub:"품목명을 몰라도 됩니다. 아래 검색창에 마우스를 올리거나 누르면 등록된 전체 품목 목록이 펼쳐집니다.",placeholder:"품목명 또는 코드로 목록 좁히기",loader:async()=>await stdGoods(),code:["item_cd","gds_cd","goods_cd","code","cd"],name:["item_nm","gds_nm","goods_nm","name","nm"],meta:["ctgry_nm","ctgry_cd"]};
+  if(kind==="catalogMarkets")return {title:"시장 정보",sub:"시장명을 몰라도 됩니다. 아래 검색창에 마우스를 올리거나 누르면 등록된 전체 시장 목록이 펼쳐집니다.",placeholder:"시장명·지역으로 목록 좁히기",loader:async()=>await stdMarkets(),code:["mrkt_cd","whsl_mrkt_cd","code","cd"],name:["mrkt_nm","whsl_mrkt_nm","name","nm"],meta:["sgg_nm","addr","address"]};
+  if(kind==="catalogOrigins")return {title:"산지 정보",sub:"산지명을 몰라도 됩니다. 아래 검색창에 마우스를 올리거나 누르면 등록된 전체 산지 목록이 펼쳐집니다.",placeholder:"산지명으로 목록 좁히기",loader:async()=>await stdOrigins(),code:["plor_cd","origin_cd","place_origin_cd","code","cd"],name:["plor_nm","origin_nm","place_origin_nm","name","nm"],meta:["ctgry_nm"]};
+  return null;
+}
+function catalogNormalized(rows,cfg){
+  const seen=new Set();
+  return rows.map(r=>({code:firstField(r,cfg.code),name:firstField(r,cfg.name),meta:firstField(r,cfg.meta||[]),raw:r})).filter(x=>x.name||x.code).filter(x=>{const k=`${x.code}|${x.name}`;if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>String(a.name||a.code).localeCompare(String(b.name||b.code),'ko'));
+}
+function catalogChoicesHtml(list,kind){
+  if(!list.length)return '<div class="catalog-search-empty">표시할 항목이 없습니다.</div>';
+  return list.map((x,i)=>`<button type="button" class="catalog-search-item" data-catalog-kind="${esc(kind)}" data-catalog-i="${i}"><b>${esc(x.name||'-')}</b><small>${esc(x.meta||x.code||'선택')}</small></button>`).join('');
+}
+function showCatalogSelected(title,x){
+  closeSheet();
+  resetResultZone();
+  openFullResult();
+  const name=x.name||title;
+  add(`${esc(name)} ${esc(title)} 정보를 조회합니다.`,"user");
+  add(`<h3>조회 완료</h3><div class="source"><span class="badge ok">정상</span> 선택한 ${esc(title)} 정보를 확인했습니다.</div><div class="result"><b>${esc(name||'-')}</b><div class="kv"><b>코드</b><span>${esc(x.code||'-')}</span>${x.meta?`<b>정보</b><span>${esc(x.meta)}</span>`:''}</div></div>`);
+}
+function fallbackCatalogRows(kind){
+  if(kind==="catalogGoods") return priceItemOptions().map(x=>({code:x.code,name:x.name,meta:"품목"}));
+  if(kind==="catalogMarkets") return (PRICE_CODEBOOK.markets||[]).map(x=>({code:x.code,name:x.name,meta:codebookRegionName(x.region)||"시장"})).sort((a,b)=>a.name.localeCompare(b.name,"ko"));
+  return [];
+}
+function installCatalogDropdown(kind,cfg){
+  const input=document.getElementById('catalogQuery');
+  const drop=document.getElementById('catalogSearchDrop');
+  const list=document.getElementById('catalogSearchList');
+  const head=document.getElementById('catalogSearchHead');
+  if(!input||!drop||!list)return {setRows:()=>{}};
+  let rows=fallbackCatalogRows(kind);
+  let loaded=false;
+  const render=()=>{
+    const q=String(input.value||'').trim().toLowerCase();
+    const filtered=rows.filter(x=>!q||`${x.name} ${x.code} ${x.meta||''}`.toLowerCase().includes(q));
+    head.textContent=`${cfg.title} · ${filtered.length}개`;
+    list.innerHTML=catalogChoicesHtml(filtered,kind);
+    list.querySelectorAll('.catalog-search-item').forEach((b,i)=>b.onclick=()=>showCatalogSelected(cfg.title,filtered[i]));
+  };
+  const open=()=>{drop.classList.add('on');render();};
+  const closeLater=()=>setTimeout(()=>{if(document.activeElement!==input&&!drop.matches(':hover'))drop.classList.remove('on')},160);
+  input.addEventListener('mouseenter',open);
+  input.addEventListener('pointerenter',open);
+  input.addEventListener('focus',open);
+  input.addEventListener('click',open);
+  input.addEventListener('input',open);
+  input.addEventListener('blur',closeLater);
+  drop.addEventListener('mouseleave',closeLater);
+  drop.addEventListener('wheel',e=>e.stopPropagation(),{passive:true});
+  // 화면을 열자마자 목록 데이터도 준비하되, 드롭다운 자체는 hover/focus 때만 표시한다.
+  render();
+  return {setRows(next){rows=next||[];loaded=true;render();},open};
+}
+
+async function openCatalogSheet(kind){
+  const cfg=catalogFields(kind);if(!cfg)return;
+  setSheet(`${head(cfg.title)}<div class="catalog-browse"><div class="hint">${esc(cfg.sub)}</div><div class="catalog-browse-search"><input id="catalogQuery" type="text" autocomplete="off" placeholder="${esc(cfg.placeholder)}"><div id="catalogSearchDrop" class="catalog-search-drop"><div id="catalogSearchHead" class="catalog-search-head">${esc(cfg.title)}</div><div id="catalogSearchList" class="catalog-search-list"><div class="catalog-search-empty">목록을 준비하는 중입니다.</div></div></div></div></div>`);
+  const ui=installCatalogDropdown(kind,cfg);
+  try{
+    const live=catalogNormalized(await cfg.loader(),cfg);
+    if(live.length) ui.setRows(live);
+  }catch(e){
+    // 로컬 file:// 미리보기에서는 Worker CORS 때문에 실패할 수 있다.
+    // 품목/시장은 내장 코드북 목록을 계속 보여주고, 산지는 배포 환경에서 실데이터가 채워진다.
+    const fallback=fallbackCatalogRows(kind);
+    if(fallback.length) ui.setRows(fallback);
+    else {
+      const list=document.getElementById('catalogSearchList');
+      const head=document.getElementById('catalogSearchHead');
+      if(head)head.textContent=`${cfg.title} · 배포 연결 필요`;
+      if(list)list.innerHTML=`<div class="catalog-search-empty">현재 로컬 미리보기에서는 Worker 연결이 없어 목록을 불러오지 못했습니다. GitHub Pages 배포 후 검색창에 마우스를 올리면 실제 목록이 표시됩니다.</div>`;
+    }
+  }
+}
+
+// v0.26: 홈 카드 hover 미리보기는 사용하지 않음. 목록은 기능 내부 검색창에서 표시한다.
+
 async function openMenu(m){
   nav.menu=m;nav.device=null;
+  if(m==="catalogGoods"||m==="catalogMarkets"){await openCatalogSheet(m);return;}
+  if(m==="usageGuide"){
+    setSheet(`${head("사용방법")}<div class="form"><div class="hint"><b>수산물 가격정보 AI 이용 순서</b></div><div class="menu-grid"><div class="menu"><strong>① 기능 선택</strong><small>상단 통합검색 또는 홈의 기능 카드를 선택합니다.</small></div><div class="menu"><strong>② 세부조건 선택</strong><small>기능을 선택하면 세부조건 화면이 모바일 전체화면으로 열립니다. 품목·날짜·기간·지역·시장 등을 넓은 화면에서 고릅니다.</small></div><div class="menu"><strong>③ 조회 실행</strong><small>조회/통합조회 버튼을 누르면 결과가 모바일 전체화면으로 표시됩니다.</small></div><div class="menu"><strong>④ 결과 확인</strong><small>가격·추세·등락·시장·경매 등 결과를 위아래로 스크롤해 확인합니다.</small></div><div class="menu"><strong>⑤ 다른 기능 조회</strong><small>결과화면의 ← 또는 X를 누르면 홈 기능화면으로 돌아가 다른 기능을 선택할 수 있습니다.</small></div><div class="menu"><strong>⑥ 전체 품목·시장</strong><small>이름을 몰라도 전체 품목·시장 정보 기능에서 검색창에 마우스를 올리거나 터치하면 등록된 전체 목록이 펼쳐져 스크롤하거나 검색해 선택할 수 있습니다.</small></div></div><div class="hint">※ 조회 결과가 0건인 경우와 API 오류는 서로 다르게 표시됩니다. 공공 API 일시 장애 시 잠시 후 다시 시도하십시오.</div></div>`);return;
+  }
   if(m==="overview"){
     setSheet(`${head("품목 통합조회")}<div class="form">${picker("fItem","품목명","수산 품목 선택")}<div class="hint">품목명 하나로 최근가격·추이·등락·일별·지역·기간 중도매·기간 소매·연월별 통계를 자동 탐색합니다. 경매·온라인은 별도 코드체계를 이용해 추가 탐색합니다.</div><button class="primary" id="run">통합조회</button></div>`);
     wirePicker("fItem",async()=>priceFishOptions());
@@ -521,17 +862,21 @@ async function openMenu(m){
   if(m==="recent"){
     setSheet(`${head("최근가격")}<div class="form">${commonPriceFields()}<button class="primary" id="run">조회</button></div>`);await initPricePickers("recent");document.getElementById("run").onclick=runRecent;return;
   }
+  if(m==="trend4"){
+    setSheet(`${head("4주 가격추세·등락 그래프")}<div class="form"><div class="hint"><b>최근 4주 가격 흐름을 그래프로 확인합니다.</b><br>품목과 필요한 세부조건을 선택한 뒤 조회하면 4주 전부터 현재까지의 가격추세와 등락률을 전체화면으로 표시합니다.</div>${commonPriceFields()}<button class="primary" id="run">4주 그래프 조회</button></div>`);
+    await initPricePickers("trend");document.getElementById("run").onclick=runFourWeekTrendGraph;return;
+  }
   if(m==="trend"||m==="change"){
     setSheet(`${head(m==="trend"?"1~4주 가격추이":"가격 등락정보")}<div class="form">${commonPriceFields()}<button class="primary" id="run">조회</button></div>`);await initPricePickers(m);document.getElementById("run").onclick=m==="trend"?runTrend:runChange;return;
   }
   if(m==="daily"){
-    setSheet(`${head("시장별 일별가격")}<div class="form"><div class="field"><label>기준일</label><input id="fDate" type="date" value="${iso()}"></div>${commonPriceFields()}${picker("fSgg","시군구","지역 선택")}${picker("fMarket","시장","지역 선택 후 시장 선택")}<button class="primary" id="run">조회</button></div>`);await initPricePickers("daily");await wirePriceRegionMarket("daily",{region:true,market:true});document.getElementById("fDate").addEventListener("change",()=>{cache.priceRows.clear();cache.smartRows.clear();resetMany(["fVrty","fGrade","fUnit","fSize","fSgg","fMarket"])});document.getElementById("run").onclick=runDaily;return;
+    setSheet(`${head("시장별 일별가격")}<div class="form"><div class="field"><label>기준일</label><input id="fDate" type="date" value="${yesterday()}"></div>${commonPriceFields()}${picker("fSgg","시군구","지역 선택")}${picker("fMarket","시장","지역 선택 후 시장 선택")}<button class="primary" id="run">조회</button></div>`);await initPricePickers("daily");await wirePriceRegionMarket("daily",{region:true,market:true});document.getElementById("fDate").addEventListener("change",()=>{cache.priceRows.clear();cache.smartRows.clear();resetMany(["fVrty","fGrade","fUnit","fSize","fSgg","fMarket"])});document.getElementById("run").onclick=runDaily;return;
   }
   if(m==="region"){
-    setSheet(`${head("지역별 가격")}<div class="form"><div class="field"><label>기준일</label><input id="fDate" type="date" value="${iso()}"></div>${commonPriceFields()}${picker("fSgg","시군구","지역 선택")}<button class="primary" id="run">조회</button></div>`);await initPricePickers("region");await wirePriceRegionMarket("region",{region:true,market:false});document.getElementById("fDate").addEventListener("change",()=>{cache.priceRows.clear();cache.smartRows.clear();resetMany(["fVrty","fGrade","fUnit","fSize","fSgg"])});document.getElementById("run").onclick=runRegion;return;
+    setSheet(`${head("지역별 가격")}<div class="form"><div class="field"><label>기준일</label><input id="fDate" type="date" value="${yesterday()}"></div>${commonPriceFields()}${picker("fSgg","시군구","지역 선택")}<button class="primary" id="run">조회</button></div>`);await initPricePickers("region");await wirePriceRegionMarket("region",{region:true,market:false});document.getElementById("fDate").addEventListener("change",()=>{cache.priceRows.clear();cache.smartRows.clear();resetMany(["fVrty","fGrade","fUnit","fSize","fSgg"])});document.getElementById("run").onclick=runRegion;return;
   }
   if(m==="pwh"||m==="prt"){
-    const stage=m==="pwh"?"중도매":"소매";setSheet(`${head(`기간별 ${stage}가격`)}<div class="form"><div class="fixed-stage">유통단계: ${stage}<small>이 메뉴는 전용 API로 유통단계가 고정됩니다.</small></div><div class="cols"><div class="field"><label>시작일</label><input id="fStart" type="date" value="${daysAgo(10)}"></div><div class="field"><label>종료일</label><input id="fEnd" type="date" value="${iso()}"></div></div>${commonPriceFields({se:false})}${picker("fSgg","시군구","지역 선택")}${picker("fMarket","시장","지역 선택 후 시장 선택")}<button class="primary" id="run">조회</button></div>`);await initPricePickers(m,{se:false});await wirePriceRegionMarket(m,{region:true,market:true});["fStart","fEnd"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{cache.priceRows.clear();cache.smartRows.clear();resetMany(["fVrty","fGrade","fUnit","fSize","fSgg","fMarket"])}));document.getElementById("run").onclick=m==="pwh"?runPwh:runPrt;return;
+    const stage=m==="pwh"?"중도매":"소매";setSheet(`${head(`기간별 ${stage}가격`)}<div class="form"><div class="fixed-stage">유통단계: ${stage}<small>이 메뉴는 전용 API로 유통단계가 고정됩니다.</small></div><div class="cols"><div class="field"><label>시작일</label><input id="fStart" type="date" value="${daysAgo(10)}"></div><div class="field"><label>종료일</label><input id="fEnd" type="date" value="${yesterday()}"></div></div>${commonPriceFields({se:false})}${picker("fSgg","시군구","지역 선택")}${picker("fMarket","시장","지역 선택 후 시장 선택")}<button class="primary" id="run">조회</button></div>`);await initPricePickers(m,{se:false});await wirePriceRegionMarket(m,{region:true,market:true});["fStart","fEnd"].forEach(id=>document.getElementById(id).addEventListener("change",()=>{cache.priceRows.clear();cache.smartRows.clear();resetMany(["fVrty","fGrade","fUnit","fSize","fSgg","fMarket"])}));document.getElementById("run").onclick=m==="pwh"?runPwh:runPrt;return;
   }
   if(m==="ym"){
     const now=new Date(),end=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;const s=new Date(now);s.setMonth(s.getMonth()-6);const start=`${s.getFullYear()}-${String(s.getMonth()+1).padStart(2,"0")}`;
@@ -542,13 +887,59 @@ async function openMenu(m){
 }
 
 function validatePriceRequired({region=false}={}){if(!getCode("fItem")){alert("품목을 목록에서 선택하십시오.");return false}return true}
-async function latestDate(item,se,vr,gr){const p={"ctgry_cd::EQ":PRICE_CATEGORY,"item_cd::EQ":item};if(se)p["se_cd::EQ"]=se;if(vr)p["vrty_cd::EQ"]=vr;if(gr)p["grd_cd::EQ"]=gr;const {rows}=await smartPriceRows("recent",p,`latest-smart|${item}|${se}|${vr}|${gr}`);return rows.map(r=>firstField(r,["exmn_ymd"])).filter(Boolean).sort().reverse()[0]||d8(iso())}
+async function latestDate(item,se,vr,gr){const p={"ctgry_cd::EQ":PRICE_CATEGORY,"item_cd::EQ":item};if(se)p["se_cd::EQ"]=se;if(vr)p["vrty_cd::EQ"]=vr;if(gr)p["grd_cd::EQ"]=gr;const {rows}=await smartPriceRows("recent",p,`latest-smart|${item}|${se}|${vr}|${gr}`);return rows.map(r=>firstField(r,["exmn_ymd"])).filter(Boolean).sort().reverse()[0]||d8(yesterday())}
 function resultLimit(rows,n=12){return rows.slice(0,n)}
 function priceRowHtml(r,{avg=false,stageOverride=""}={}){const p=avg?firstField(r,["exmn_dd_avg_prc","pmm_avgprc","avgprc"]):firstField(r,["exmn_dd_prc","exmn_dd_avg_prc","pmm_avgprc"]);return `<div class="result"><b>${esc(firstField(r,["exmn_ymd","exmn_ym"])||"-")} · ${esc(firstField(r,["sgg_nm"])||"")} ${esc(firstField(r,["mrkt_nm"])||"")}</b><div class="kv"><b>유통단계</b><span>${esc(firstField(r,["se_nm"])||stageOverride||"-")}</span><b>품종/상태</b><span>${esc(firstField(r,["vrty_nm"])||"-")}</span><b>등급</b><span>${esc(gradeDisplay(firstField(r,["grd_nm"])||"-"))}</span><b>단위</b><span>${esc(firstField(r,["unit","unit_nm"])||"-")}</span><b>규격</b><span>${esc(firstField(r,["unit_sz","sz_nm"])||"-")}</span><b>가격</b><span>${fmt(p)}원 / ${esc(unitText(r))}</span><b>kg 환산</b><span>${fmt(firstField(r,["exmn_dd_cnvs_prc","exmn_dd_cnvs_avg_prc"]))}원/kg</span></div></div>`}
 async function runRecent(){if(!validatePriceRequired())return;const name=getVal("fItem"),p=priceParamsBase();closeSheet();add(`${esc(name)} 최근가격을 넓게 조회합니다.`,"user");try{const {rows,meta}=await smartPriceRows("recent",p,`recent-smart|${JSON.stringify(p)}`);if(!rows.length)return smartNoData(meta);add(`<h3>🐟 ${esc(name)} 최근가격</h3>${season(name)}${searchMetaHtml(meta)}${resultLimit(rows,12).map(r=>priceRowHtml(r)).join("")}<div class="source">단위·규격은 검색조건이 아니라 실제 API 응답값으로 표시합니다.</div>`)}catch(e){err(e)}}
+function nval(v){const n=Number(String(v??"").replace(/,/g,""));return Number.isFinite(n)?n:null}
+function fourWeekGraphHtml(name,row,changeRow,actualDate){
+  const raw=[
+    ["4주 전",nval(firstField(row,["ww4_bfr_avg_prc"]))],
+    ["3주 전",nval(firstField(row,["ww3_bfr_avg_prc"]))],
+    ["2주 전",nval(firstField(row,["ww2_bfr_avg_prc"]))],
+    ["1주 전",nval(firstField(row,["ww1_bfr_avg_prc"]))],
+    ["현재",nval(firstField(row,["exmn_dd_avg_prc"]))]
+  ];
+  const pts=raw.filter(([,v])=>v!==null);
+  if(!pts.length)return `<div class="full-result-empty">4주 가격 그래프를 만들 수 있는 가격값이 없습니다.</div>`;
+  const vals=pts.map(x=>x[1]), min=Math.min(...vals), max=Math.max(...vals), spread=Math.max(1,max-min);
+  const W=320,H=190,L=38,R=14,T=18,B=38, iw=W-L-R, ih=H-T-B;
+  const coords=pts.map((x,i)=>{const xx=L+(pts.length===1?iw/2:i*iw/(pts.length-1));const yy=T+(max-x[1])*ih/spread;return [xx,yy,x[0],x[1]]});
+  const poly=coords.map(x=>`${x[0].toFixed(1)},${x[1].toFixed(1)}`).join(" ");
+  const grid=[0,.25,.5,.75,1].map(f=>{const y=T+ih*f;const val=max-spread*f;return `<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#d7e8f2" stroke-width="1"/><text x="${L-5}" y="${y+3}" text-anchor="end" font-size="8" fill="#6d8595">${Math.round(val).toLocaleString("ko-KR")}</text>`}).join("");
+  const dots=coords.map(([x,y,label,val])=>`<circle cx="${x}" cy="${y}" r="4.5" fill="#0a8fd3" stroke="#fff" stroke-width="2"/><text x="${x}" y="${H-12}" text-anchor="middle" font-size="8.5" fill="#456579">${label}</text><text x="${x}" y="${Math.max(10,y-9)}" text-anchor="middle" font-size="8.5" font-weight="800" fill="#103b58">${Math.round(val).toLocaleString("ko-KR")}</text>`).join("");
+  const first=raw[0][1], current=raw[4][1];
+  const fourRate=(first&&current!==null)?((current-first)/first*100):null;
+  const day=nval(firstField(changeRow||{},["dd1_bfr_cmpr_raftr"])), week=nval(firstField(changeRow||{},["ww1_bfr_cmpr_raftr"])), month=nval(firstField(changeRow||{},["mm1_bfr_cmpr_raftr"]));
+  const rate=(label,v)=>`<div class="trend-rate"><span>${label}</span><b class="${v===null?'flat':v>0?'up':v<0?'down':'flat'}">${v===null?'-':`${v>0?'+':''}${v.toFixed(1)}%`}</b></div>`;
+  return `<div class="trend-hero"><div><small>조회 품목</small><h3>${esc(name)}</h3><p>기준일 ${esc(actualDate||'-')} · 최근 4주 가격추세</p></div><div class="trend-current"><small>현재 평균</small><b>${current===null?'-':fmt(current)}원</b></div></div>
+  <div class="trend-chart-card"><div class="trend-chart-title"><b>4주 가격추세</b><span>${fourRate===null?'4주 비교 불가':`4주 전 대비 ${fourRate>0?'+':''}${fourRate.toFixed(1)}%`}</span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(name)} 4주 가격 추세 그래프">${grid}<polyline points="${poly}" fill="none" stroke="#0a8fd3" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>${dots}</svg></div>
+  <div class="trend-rate-grid">${rate('전일 대비',day)}${rate('1주 대비',week)}${rate('1개월 대비',month)}${rate('4주 전 대비',fourRate)}</div>
+  <div class="overview-note">그래프는 공공데이터 응답의 현재·1주 전·2주 전·3주 전·4주 전 평균가격을 시각화합니다. 값이 없는 주차는 임의 보간하지 않습니다.</div>`;
+}
+async function runFourWeekTrendGraph(){
+  if(!validatePriceRequired())return;
+  const d=currentDetail(),name=getVal("fItem");
+  closeSheet();
+  resetResultZone();
+  openFullResult();
+  add(`${esc(name)} 최근 4주 가격추세와 등락을 그래프로 조회합니다.`,"user");
+  try{
+    const dt=await latestDate(d.item,d.se,d.vr,d.gr);
+    const p={"exmn_ymd::EQ":dt,"ctgry_cd::EQ":PRICE_CATEGORY,"item_cd::EQ":d.item};if(d.se)p["se_cd::EQ"]=d.se;if(d.vr)p["vrty_cd::EQ"]=d.vr;if(d.gr)p["grd_cd::EQ"]=d.gr;
+    const [trendRes,changeRes]=await Promise.all([
+      smartPriceRows("trend",p,`trend4-smart|${JSON.stringify(p)}`),
+      smartPriceRows("change",p,`trend4-change|${JSON.stringify(p)}`)
+    ]);
+    if(!trendRes.rows.length)return smartNoData(trendRes.meta);
+    const r=trendRes.rows[0], cr=changeRes.rows?.[0]||{}, actualDate=firstField(r,["exmn_ymd"])||dt;
+    add(`<h3>📉 4주 추세·등락</h3>${searchMetaHtml(trendRes.meta)}${fourWeekGraphHtml(name,r,cr,actualDate)}`);
+  }catch(e){err(e)}
+}
+
 async function runTrend(){if(!validatePriceRequired())return;await runTrendChange("/api/trend","📈 가격추이",false)}
 async function runChange(){if(!validatePriceRequired())return;await runTrendChange("/api/change","↕ 가격 등락정보",true)}
-async function runTrendChange(path,title,isChange){const d=currentDetail(),name=getVal("fItem"),dt=await latestDate(d.item,d.se,d.vr,d.gr);closeSheet();add(`${esc(name)} ${title.replace(/[📈↕]/g,"")}를 조회합니다.`,"user");try{const target=path==="/api/trend"?"trend":"change";const p={"exmn_ymd::EQ":dt,"ctgry_cd::EQ":PRICE_CATEGORY,"item_cd::EQ":d.item};if(d.se)p["se_cd::EQ"]=d.se;if(d.vr)p["vrty_cd::EQ"]=d.vr;if(d.gr)p["grd_cd::EQ"]=d.gr;const {rows,meta}=await smartPriceRows(target,p,`${target}-smart|${JSON.stringify(p)}`);if(!rows.length)return smartNoData(meta);const r=rows[0];const actualDate=firstField(r,["exmn_ymd"])||dt;add(`<h3>${title}</h3>${searchMetaHtml(meta)}<div class="kv"><b>기준일</b><span>${esc(actualDate)}</span><b>품종/상태</b><span>${esc(firstField(r,["vrty_nm"])||"-")}</span><b>등급</b><span>${esc(gradeDisplay(firstField(r,["grd_nm"])||"-"))}</span><b>단위/규격</b><span>${esc(unitText(r))}</span>${isChange?`<b>현재 평균</b><span>${fmt(firstField(r,["exmn_dd_avg_prc"]))}원</span><b>전일 대비</b><span>${fmt(firstField(r,["dd1_bfr_cmpr_raftr"]))}%</span><b>1주 대비</b><span>${fmt(firstField(r,["ww1_bfr_cmpr_raftr"]))}%</span><b>1개월 대비</b><span>${fmt(firstField(r,["mm1_bfr_cmpr_raftr"]))}%</span><b>1년 대비</b><span>${fmt(firstField(r,["yy1_bfr_cmpr_raftr"]))}%</span>`:`<b>현재</b><span>${fmt(firstField(r,["exmn_dd_avg_prc"]))}원</span><b>1주 전</b><span>${fmt(firstField(r,["ww1_bfr_avg_prc"]))}원</span><b>2주 전</b><span>${fmt(firstField(r,["ww2_bfr_avg_prc"]))}원</span><b>3주 전</b><span>${fmt(firstField(r,["ww3_bfr_avg_prc"]))}원</span><b>4주 전</b><span>${fmt(firstField(r,["ww4_bfr_avg_prc"]))}원</span>`}</div>`)}catch(e){err(e)}}
+async function runTrendChange(path,title,isChange){const d=currentDetail(),name=getVal("fItem");closeSheet();resetResultZone();openFullResult();add(`${esc(name)} ${title.replace(/[📈↕]/g,"")}를 조회합니다.`,"user");try{const dt=await latestDate(d.item,d.se,d.vr,d.gr);const target=path==="/api/trend"?"trend":"change";const p={"exmn_ymd::EQ":dt,"ctgry_cd::EQ":PRICE_CATEGORY,"item_cd::EQ":d.item};if(d.se)p["se_cd::EQ"]=d.se;if(d.vr)p["vrty_cd::EQ"]=d.vr;if(d.gr)p["grd_cd::EQ"]=d.gr;const {rows,meta}=await smartPriceRows(target,p,`${target}-smart|${JSON.stringify(p)}`);if(!rows.length)return smartNoData(meta);const r=rows[0];const actualDate=firstField(r,["exmn_ymd"])||dt;add(`<h3>${title}</h3>${searchMetaHtml(meta)}<div class="kv"><b>기준일</b><span>${esc(actualDate)}</span><b>품종/상태</b><span>${esc(firstField(r,["vrty_nm"])||"-")}</span><b>등급</b><span>${esc(gradeDisplay(firstField(r,["grd_nm"])||"-"))}</span><b>단위/규격</b><span>${esc(unitText(r))}</span>${isChange?`<b>현재 평균</b><span>${fmt(firstField(r,["exmn_dd_avg_prc"]))}원</span><b>전일 대비</b><span>${fmt(firstField(r,["dd1_bfr_cmpr_raftr"]))}%</span><b>1주 대비</b><span>${fmt(firstField(r,["ww1_bfr_cmpr_raftr"]))}%</span><b>1개월 대비</b><span>${fmt(firstField(r,["mm1_bfr_cmpr_raftr"]))}%</span><b>1년 대비</b><span>${fmt(firstField(r,["yy1_bfr_cmpr_raftr"]))}%</span>`:`<b>현재</b><span>${fmt(firstField(r,["exmn_dd_avg_prc"]))}원</span><b>1주 전</b><span>${fmt(firstField(r,["ww1_bfr_avg_prc"]))}원</span><b>2주 전</b><span>${fmt(firstField(r,["ww2_bfr_avg_prc"]))}원</span><b>3주 전</b><span>${fmt(firstField(r,["ww3_bfr_avg_prc"]))}원</span><b>4주 전</b><span>${fmt(firstField(r,["ww4_bfr_avg_prc"]))}원</span>`}</div>`)}catch(e){err(e)}}
 async function runDaily(){if(!validatePriceRequired({region:true}))return;const name=getVal("fItem"),date=d8(getVal("fDate"));closeSheet();add(`${esc(name)} 시장별 일별가격을 조회합니다.`,"user");try{const p=priceParamsBase({"exmn_ymd::GTE":date,"exmn_ymd::LTE":date});const {rows,meta}=await smartPriceRows("daily",p,`daily-smart|${JSON.stringify(p)}`);if(!rows.length)return smartNoData(meta);add(`<h3>🏪 ${esc(name)} 시장별 일별가격</h3>${searchMetaHtml(meta)}${resultLimit(rows,15).map(r=>priceRowHtml(r)).join("")}`)}catch(e){err(e)}}
 async function runRegion(){if(!validatePriceRequired({region:true}))return;const name=getVal("fItem"),date=d8(getVal("fDate"));closeSheet();add(`${esc(name)} 지역별 가격을 조회합니다.`,"user");try{const p=priceParamsBase({"exmn_ymd::GTE":date,"exmn_ymd::LTE":date});delete p["mrkt_cd::EQ"];const {rows,meta}=await smartPriceRows("region",p,`region-smart|${JSON.stringify(p)}`);if(!rows.length)return smartNoData(meta);add(`<h3>📍 ${esc(name)} 지역별 가격</h3>${searchMetaHtml(meta)}${resultLimit(rows,15).map(r=>`<div class="result"><b>${esc(firstField(r,["sgg_nm"])||"-")} · ${esc(firstField(r,["se_nm"])||"-")}</b><div class="kv"><b>품종/상태</b><span>${esc(firstField(r,["vrty_nm"])||"-")}</span><b>등급</b><span>${esc(gradeDisplay(firstField(r,["grd_nm"])||"-"))}</span><b>단위/규격</b><span>${esc(unitText(r))}</span><b>평균</b><span>${fmt(firstField(r,["exmn_dd_avg_prc"]))}원</span><b>최저</b><span>${fmt(firstField(r,["exmn_dd_min_prc"]))}원</span><b>최고</b><span>${fmt(firstField(r,["exmn_dd_max_prc"]))}원</span></div></div>`).join("")}`)}catch(e){err(e)}}
 async function runPeriod(type){if(!validatePriceRequired({region:false}))return;const name=getVal("fItem"),s=d8(getVal("fStart")),e=d8(getVal("fEnd")),target=type==="wholesale"?"wholesale":"retail";closeSheet();add(`${esc(name)} 기간별 ${type==="wholesale"?"중도매":"소매"}가격을 조회합니다.`,"user");try{const p=priceParamsBase({"exmn_ymd::GTE":s,"exmn_ymd::LTE":e});delete p["se_cd::EQ"];const {rows,meta}=await smartPriceRows(target,p,`${target}-smart|${JSON.stringify(p)}`);if(!rows.length)return smartNoData(meta);add(`<h3>🗓 ${esc(name)} 기간별 ${type==="wholesale"?"중도매":"소매"}</h3>${searchMetaHtml(meta)}${resultLimit(rows,15).map(r=>priceRowHtml(r,{stageOverride:type==="wholesale"?"중도매":"소매"})).join("")}`)}catch(e){err(e)}}
@@ -568,14 +959,9 @@ function overviewValueHtml(key,r){
   return `<div class="kv"><b>기준</b><span>${esc(firstField(r,["exmn_ymd","exmn_ym"])||"-")}</span><b>유통단계</b><span>${esc(firstField(r,["se_nm"])||(key==="wholesale"?"중도매":key==="retail"?"소매":"-"))}</span><b>품종/상태</b><span>${esc(firstField(r,["vrty_nm"])||"-")}</span><b>단위/규격</b><span>${esc(unitText(r))}</span><b>가격</b><span>${fmt(p)}원</span></div>`;
 }
 function overviewSectionHtml(key,data){
-  const label=overviewEndpointLabel(key),rows=data?.rows||[],count=Number(data?.rowCount||0);
-  const status=data?.status||(count>0?"available":data?.ok===false?"error":"empty");
-  const state=status==="available"?`<span class="badge ok">${fmt(count)}건</span>`:status==="empty"?`<span class="badge">0건</span>`:status==="unconfirmed"?`<span class="badge warn">미확인</span>`:`<span class="badge warn">API 오류</span>`;
-  let body="";
-  if(count>0)body=`<div class="overview-mini">${overviewValueHtml(key,rows[0])}</div>`;
-  else if(status==="empty")body=`<div class="overview-empty">자동탐색 범위를 정상 확인했으나 실제 자료가 없습니다.</div>`;
-  else if(status==="unconfirmed")body=`<div class="overview-empty">탐색 한도 안에서 최종 확인하지 못했습니다. 세부조회에서 추가 확인할 수 있습니다.</div>`;
-  else body=`<div class="overview-empty">${esc(data?.error||"공공 API 호출 오류를 확인하십시오.")}</div>`;
+  const label=overviewEndpointLabel(key),rows=data?.rows||[],count=Number(data?.rowCount||0),ok=data?.ok!==false;
+  const state=!ok?`<span class="badge warn">API 확인</span>`:count?`<span class="badge ok">${fmt(count)}건</span>`:`<span class="badge">0건</span>`;
+  const body=count?`<div class="overview-mini">${overviewValueHtml(key,rows[0])}</div>`:`<div class="overview-empty">${ok?"현재 자동탐색 범위에서 실제 자료가 없습니다.":esc(data?.error||"API 호출을 확인하십시오.")}</div>`;
   return `<div class="overview-section"><div class="overview-title"><strong>${esc(label)}</strong>${state}</div>${body}<button type="button" class="overview-detail" data-overview-menu="${overviewMenuFor(key)}">세부조회</button></div>`;
 }
 function bindOverviewButtons(row,item){
@@ -614,12 +1000,8 @@ async function runItemOverview(item){
   try{
     const raw=await api("/api/item-overview",{item_cd:item.code,item_nm:item.name,ctgry_cd:PRICE_CATEGORY});
     const order=["recent","trend","change","daily","region","wholesale","retail","yearmonth"],results=raw?.results||{};
-    const statusList=order.map(k=>results[k]?.status||(Number(results[k]?.rowCount||0)>0?"available":results[k]?.ok===false?"error":"empty"));
-    const avail=Number(raw?.availableCount??statusList.filter(x=>x==="available").length);
-    const empty=Number(raw?.emptyCount??statusList.filter(x=>x==="empty").length);
-    const unconfirmed=Number(raw?.unconfirmedCount??statusList.filter(x=>x==="unconfirmed").length);
-    const errs=Number(raw?.errorCount??statusList.filter(x=>x==="error").length);
-    loading.querySelector(".bubble").innerHTML=`<h3>🐟 ${esc(item.name)} 통합정보</h3>${season(item.name)}<div class="overview-summary"><div class="overview-stat"><b>${avail}</b><small>자료 있음</small></div><div class="overview-stat"><b>${empty}</b><small>0건</small></div><div class="overview-stat"><b>${unconfirmed}</b><small>미확인</small></div><div class="overview-stat"><b>${errs}</b><small>API 오류</small></div></div><div class="overview-note">최근가격 기준일: ${esc(raw?.referenceDate||"-")} · 미확인은 탐색 한도 등으로 최종 판정하지 못한 상태입니다.</div>${order.map(k=>overviewSectionHtml(k,results[k])).join("")}<div class="source">품목코드 ${esc(item.code)}를 고정한 실제 공공데이터 자동탐색 결과입니다. 자료 있음·확정 0건·미확인·API 오류를 구분하며 임의값으로 보완하지 않습니다.</div>`;
+    const avail=Number(raw?.availableCount||0),total=Number(raw?.endpointCount||order.length),errs=Number(raw?.errorCount||0);
+    loading.querySelector(".bubble").innerHTML=`<h3>🐟 ${esc(item.name)} 통합정보</h3>${season(item.name)}<div class="overview-summary"><div class="overview-stat"><b>${avail}</b><small>자료 있음</small></div><div class="overview-stat"><b>${total-avail}</b><small>0건/확인</small></div><div class="overview-stat"><b>${esc(raw?.referenceDate||"-")}</b><small>기준일</small></div><div class="overview-stat"><b>${errs}</b><small>API 오류</small></div></div>${order.map(k=>overviewSectionHtml(k,results[k])).join("")}<div class="source">품목코드 ${esc(item.code)}를 고정한 실제 공공데이터 자동탐색 결과입니다. 0건은 임의값으로 보완하지 않습니다.</div>`;
     bindOverviewButtons(loading,item);
     const trade=add(`<h3>🔨 경매·온라인 자동탐색</h3><div class="overview-loading">별도 코드체계를 대응시켜 추가 탐색하고 있습니다...</div>`);
     const [a,o]=await Promise.all([overviewAuction(item.name),overviewOnline(item.name)]);
@@ -955,6 +1337,21 @@ document.getElementById("composer").onsubmit=async e=>{
   }
 };
 
+async function checkApiHealth(){
+  const dot=document.querySelector(".dot"),sub=document.querySelector(".sub");
+  try{
+    const h=await api("/health",{});
+    if(h?.ok){
+      if(dot)dot.style.background="#2fb344";
+      if(sub)sub.innerHTML=`<span class="dot"></span>aT 공공데이터 연계 · v0.26 · API 정상`;
+      return true;
+    }
+  }catch(e){}
+  if(dot)dot.style.background="#d92d20";
+  if(sub)sub.innerHTML=`<span class="dot" style="background:#d92d20"></span>aT 공공데이터 연계 · v0.26 · 결과창 동작 FIX`;
+  return false;
+}
+
 let speechRecognition=null,isVoiceRecognizing=false;
 function stopVoiceUI(){isVoiceRecognizing=false;document.getElementById("micBtn").classList.remove("active");mainInput.placeholder="품목·기능을 선택 또는 검색"}
 function toggleVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){add(`<h3>🎤 음성검색</h3>현재 브라우저가 Web Speech 음성인식을 지원하지 않습니다. Chrome 계열 브라우저에서는 한국어 음성검색을 사용할 수 있습니다.`);return}if(isVoiceRecognizing&&speechRecognition){speechRecognition.stop();return}try{speechRecognition=new SR();speechRecognition.lang="ko-KR";speechRecognition.continuous=false;speechRecognition.interimResults=true;speechRecognition.onstart=()=>{isVoiceRecognizing=true;document.getElementById("micBtn").classList.add("active");mainInput.placeholder="음성을 듣고 있습니다..."};speechRecognition.onresult=e=>{let t="";for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;mainInput.value=t;openMainSuggest()};speechRecognition.onerror=()=>stopVoiceUI();speechRecognition.onend=()=>{stopVoiceUI();if(mainInput.value.trim())openMainSuggest()};speechRecognition.start()}catch(e){stopVoiceUI();add(`<div class="err">음성검색을 시작하지 못했습니다: ${esc(e.message||e)}</div>`)}}
@@ -971,15 +1368,52 @@ function usePhoto(){const type=getVal("photoType"),file=getVal("photoFileName");
 function openPhotoTool(){nav.device="photo";nav.group=null;nav.menu=null;setSheet(`${head("사진·카메라")}<div class="form"><div class="field"><label>사진 유형</label><select id="photoType">${PHOTO_TYPES.map(v=>`<option>${esc(v)}</option>`).join("")}</select></div><div class="camera-box"><video id="cameraVideo" playsinline style="display:none"></video><img id="photoPreview" alt="사진 미리보기" style="display:none"><div id="cameraPlaceholder" class="camera-placeholder">실시간 카메라 또는 갤러리 사진을 선택하십시오.</div></div><div id="cameraStatus" class="camera-status">카메라 상태: 대기</div><div class="photo-actions"><button type="button" id="startCam">카메라 연결</button><button type="button" id="captureCam">사진 촬영</button><button type="button" id="pickGallery">갤러리</button></div><input id="photoFileInput" class="hidden-file" type="file" accept="image/*"><div class="field"><label>파일명</label><input id="photoFileName" placeholder="촬영/선택 후 자동 입력"></div><button class="primary" id="usePhotoBtn" type="button">이 사진 사용</button><div class="hint">사진은 품목 연결과 기록 보조용입니다. OCR/이미지분석 API가 실제 연결되기 전에는 사진 내용을 자동 분석했다고 표시하지 않습니다.</div></div>`);document.getElementById("startCam").onclick=startCamera;document.getElementById("captureCam").onclick=capturePhoto;document.getElementById("pickGallery").onclick=()=>document.getElementById("photoFileInput").click();document.getElementById("photoFileInput").onchange=handlePhotoFile;document.getElementById("usePhotoBtn").onclick=usePhoto}
 document.getElementById("cameraBtn").onclick=openPhotoTool;
 
+let deferredInstallPrompt=null,installWasDragged=false;const INSTALL_POS_KEY="kafv_fish_price_ai_install_pos_v4_v018";
+function standalone(){return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true}
+function clampInstall(left,top){const b=document.getElementById("installBtn");return {left:Math.min(Math.max(0,left),Math.max(0,phone.clientWidth-b.offsetWidth)),top:Math.min(Math.max(0,top),Math.max(0,phone.clientHeight-b.offsetHeight))}}
+function applySavedInstall(){try{const s=JSON.parse(localStorage.getItem(INSTALL_POS_KEY)||"null");if(!s)return;const p=clampInstall(s.left,s.top),b=document.getElementById("installBtn");b.style.left=`${p.left}px`;b.style.top=`${p.top}px`;b.style.right="auto"}catch(e){}}
+function enableInstallDrag(){const b=document.getElementById("installBtn");let drag=null;b.addEventListener("pointerdown",e=>{if(e.button!==undefined&&e.button!==0)return;const fr=phone.getBoundingClientRect(),br=b.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:br.left-fr.left,top:br.top-fr.top,moved:false};installWasDragged=false;b.setPointerCapture?.(e.pointerId);b.classList.add("dragging")});b.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.moved&&Math.hypot(dx,dy)<6)return;drag.moved=true;installWasDragged=true;e.preventDefault();const p=clampInstall(drag.left+dx,drag.top+dy);b.style.left=`${p.left}px`;b.style.top=`${p.top}px`;b.style.right="auto"});const finish=e=>{if(!drag||e.pointerId!==drag.id)return;b.classList.remove("dragging");if(drag.moved){try{localStorage.setItem(INSTALL_POS_KEY,JSON.stringify({left:parseFloat(b.style.left)||0,top:parseFloat(b.style.top)||0}))}catch(e){console.warn("[PWA] install position storage unavailable",e)}};try{b.releasePointerCapture?.(e.pointerId)}catch(_){}drag=null};b.addEventListener("pointerup",finish);b.addEventListener("pointercancel",finish);window.addEventListener("resize",()=>{if(!b.style.left)return;const p=clampInstall(parseFloat(b.style.left),parseFloat(b.style.top));b.style.left=`${p.left}px`;b.style.top=`${p.top}px`})}
+async function installApp(){if(installWasDragged){installWasDragged=false;return}if(standalone())return;if(deferredInstallPrompt){deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice}catch(e){}deferredInstallPrompt=null;return}const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);add(`<h3>📲 앱 설치 안내</h3>${ios?"Safari의 공유 버튼을 누른 뒤 <b>홈 화면에 추가</b>를 선택하십시오.":"브라우저 메뉴(⋮)에서 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 선택하십시오."}`)}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e});window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("installBtn").classList.add("hidden")});document.getElementById("installBtn").onclick=installApp;
 
-document.getElementById("fontBtn").onclick=()=>document.body.classList.toggle("big");
-document.getElementById("settingsBtn").onclick=()=>{nav.group=null;nav.menu=null;nav.device=null;setSheet(`${head("설정·데이터 원칙")}<div class="hint"><b>수산물 가격정보 AI · 데이터 운영 원칙</b><br><br>① API Key는 GitHub/HTML에 저장하지 않고 Cloudflare Worker Secret에서 관리합니다.<br>② 품목만 필수이며 유통단계·품종/상태·등급·지역·시장은 전체(자동)로 넓게 시작할 수 있습니다.<br>③ 정확조건이 0건이면 Worker v0.7.2가 품목코드를 고정한 채 등급 → 품종/상태 → 유통단계 → 필요 시 거래일/시장/지역을 단계적으로 확대합니다.<br>④ 자동확대가 발생하면 결과에 어떤 조건이 완화됐는지 반드시 표시합니다.<br>⑤ 어기·비어기는 검색 차단조건으로 사용하지 않고 결과 해석정보로만 사용합니다.<br>⑥ 단위·규격/단위크기는 선택조건에서 제외하고 실제 API 원자료 값을 결과에서 표시합니다.<br>⑦ 품목명만 입력하면 Worker v0.7.2의 /api/item-overview가 8개 가격 Endpoint를 자동탐색합니다.<br>⑧ 경매·온라인은 가격 API와 코드체계가 달라 별도 명칭대응 방식으로 추가 탐색합니다.<br>⑨ 0건과 API 오류를 구분하며 원자료를 임의 생성하지 않습니다.</div>`) };
+const FONT_LEVEL_KEY="kafv_fish_price_font_level_v026";
+const FONT_LEVELS=["normal","large","xlarge"];
+function applyFontLevel(level,save=true){
+  if(!FONT_LEVELS.includes(level))level="normal";
+  document.body.classList.remove("font-large","font-xlarge");
+  if(level==="large")document.body.classList.add("font-large");
+  if(level==="xlarge")document.body.classList.add("font-xlarge");
+  const btn=document.getElementById("fontBtn");
+  if(btn){
+    btn.textContent=level==="normal"?"가":level==="large"?"가+":"가++";
+    btn.title=`글자 크기: ${level==="normal"?"기본":level==="large"?"크게":"더 크게"}`;
+    btn.setAttribute("aria-label",btn.title+". 누르면 다음 단계로 변경");
+  }
+  if(save){try{localStorage.setItem(FONT_LEVEL_KEY,level)}catch(_){}}
+}
+function cycleFontLevel(){
+  const current=document.body.classList.contains("font-xlarge")?"xlarge":document.body.classList.contains("font-large")?"large":"normal";
+  const next=current==="normal"?"large":current==="large"?"xlarge":"normal";
+  applyFontLevel(next,true);
+}
+document.getElementById("fontBtn").onclick=cycleFontLevel;
+document.getElementById("settingsBtn").onclick=()=>{nav.group=null;nav.menu=null;nav.device=null;setSheet(`${head("설정·데이터 원칙")}<div class="hint"><b>버전 v0.26 · 14개 조회기능 + 사용방법 + 전체화면 결과</b><br><br>① API Key는 GitHub/HTML에 저장하지 않고 Cloudflare Worker Secret에서 관리합니다.<br>② 품목만 필수이며 유통단계·품종/상태·등급·지역·시장은 전체(자동)로 넓게 시작할 수 있습니다.<br>③ 정확조건이 0건이면 Worker v0.7.2가 품목코드를 고정한 채 등급 → 품종/상태 → 유통단계 → 필요 시 거래일/시장/지역을 단계적으로 확대합니다.<br>④ 자동확대가 발생하면 결과에 어떤 조건이 완화됐는지 반드시 표시합니다.<br>⑤ 어기·비어기는 검색 차단조건으로 사용하지 않고 결과 해석정보로만 사용합니다.<br>⑥ 단위·규격/단위크기는 선택조건에서 제외하고 실제 API 원자료 값을 결과에서 표시합니다.<br>⑦ 품목명만 입력하면 Worker v0.7.2의 /api/item-overview가 8개 가격 Endpoint를 자동탐색합니다.<br>⑧ 경매·온라인은 가격 API와 코드체계가 달라 별도 명칭대응 방식으로 추가 탐색합니다.<br>⑨ 0건과 API 오류를 구분하며 원자료를 임의 생성하지 않습니다.</div>`) };
 
 window.addEventListener("DOMContentLoaded",()=>{
+  try{applyFontLevel(localStorage.getItem(FONT_LEVEL_KEY)||"normal",false)}catch(_){applyFontLevel("normal",false)}
+  applySavedInstall();
+  enableInstallDrag();
   priceFishOptions().catch(()=>{});
+  checkApiHealth().catch(()=>{});
 });
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(e=>console.warn("[PWA] Service Worker registration failed",e)))}
 
+const resultResetBtn=document.getElementById("resultResetBtn");
+resultResetBtn?.addEventListener("click",resetResultZone);
+document.getElementById("fullResultReset")?.addEventListener("click",resetResultZone);
+document.getElementById("fullResultClose")?.addEventListener("click",closeFullResult);
+document.getElementById("fullResultBack")?.addEventListener("click",closeFullResult);
+document.getElementById("fullResultHome")?.addEventListener("click",closeFullResult);
 </script>
 </body>
 </html>
