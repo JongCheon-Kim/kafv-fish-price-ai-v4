@@ -103,7 +103,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 @media(max-height:720px){.hero-card-v18{height:124px}.home-menu-grid button{min-height:64px}.home-dashboard{gap:8px}}
 
 
-/* v0.26 fullscreen result view */
+/* v0.27 fullscreen result view */
 .result-divider,.result-zone{display:none!important}
 .full-result{position:absolute;inset:0;background:#eef7fc;z-index:60;display:none;grid-template-rows:auto 1fr auto;overflow:hidden}.full-result.on{display:grid}
 .full-result-head{height:62px;background:linear-gradient(135deg,#0878c8,#19aee0);color:#fff;display:flex;align-items:center;gap:8px;padding:10px 12px;box-shadow:0 2px 10px rgba(0,79,130,.20)}
@@ -111,7 +111,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 .full-result-body{overflow:auto;padding:14px 12px 24px;overscroll-behavior:contain}.full-result-body .row{margin:8px 0}.full-result-body .bubble{max-width:100%;width:100%;border-radius:16px}.full-result-body .bot .bubble{background:#fff;border:1px solid #cce3f0}.full-result-body .user .bubble{background:#d9f0ff;border:1px solid #a9d5ef}.full-result-empty{background:#fff;border:1px dashed #9ecde7;border-radius:16px;padding:28px 18px;text-align:center;color:#527789;font-size:12px;line-height:1.6}.full-result-foot{display:flex;gap:8px;background:#fff;border-top:1px solid #d5e1e8;padding:9px 12px calc(9px + env(safe-area-inset-bottom))}.full-result-foot button{flex:1;border:0;border-radius:13px;padding:11px;font-weight:900}.full-result-home{background:#e8f4fb;color:#0a689e}.full-result-reset{background:#0a8fd3;color:#fff}
 
 
-/* v0.26 refined: 상세 선택화면도 모바일 전체화면 */
+/* v0.27 refined: 상세 선택화면도 모바일 전체화면 */
 .sheet-bg{align-items:stretch!important;background:#eef7fc!important;z-index:70!important}
 .sheet-bg.on{display:flex!important}
 .sheet{height:100%!important;max-height:none!important;border-radius:0!important;padding:0 14px calc(18px + env(safe-area-inset-bottom))!important;background:#f7fbfe!important;overflow:auto!important}
@@ -130,7 +130,7 @@ button,input,select{font:inherit} button{cursor:pointer}
 
 
 
-/* v0.26 접근성: 앱 전체 글자 크기 3단계 */
+/* v0.27 접근성: 앱 전체 글자 크기 3단계 */
 #fontBtn{transition:background .15s,color .15s,transform .15s;white-space:nowrap;font-size:15px}
 body.font-large #fontBtn,body.font-xlarge #fontBtn{background:#dff2ff;color:#086fae}
 body.font-xlarge #fontBtn{box-shadow:0 0 0 2px #9bd4f2 inset}
@@ -189,7 +189,7 @@ body.font-xlarge .menu{min-height:88px}
 <div class="stage"><main class="phone" id="phone">
 <header class="header">
   <div class="logo">🐟</div>
-  <div class="brand"><div class="title">KAFV 수산물 가격정보 AI</div><div class="sub"><span class="dot"></span>aT 공공데이터 연계 · v0.26</div></div>
+  <div class="brand"><div class="title">KAFV 수산물 가격정보 AI</div><div class="sub"><span class="dot"></span>aT 공공데이터 연계 · v0.27</div></div>
   <button class="hbtn" id="fontBtn" type="button" title="글자 크기: 기본" aria-label="글자 크기 변경">가</button>
   <button class="hbtn" id="settingsBtn" title="설정">⚙</button>
 </header>
@@ -242,7 +242,7 @@ body.font-xlarge .menu{min-height:88px}
   </section>
 </section>
 <section class="full-result" id="fullResult" aria-live="polite">
-  <header class="full-result-head"><button type="button" class="full-result-back" id="fullResultBack" aria-label="뒤로가기">←</button><div><h2>조회 결과</h2><small>수산물 가격정보 AI · v0.26</small></div><button type="button" class="full-result-close" id="fullResultClose" aria-label="닫기">×</button></header>
+  <header class="full-result-head"><button type="button" class="full-result-back" id="fullResultBack" aria-label="뒤로가기">←</button><div><h2>조회 결과</h2><small>수산물 가격정보 AI · v0.27</small></div><button type="button" class="full-result-close" id="fullResultClose" aria-label="닫기">×</button></header>
   <div class="full-result-body" id="fullResultBody"><div class="full-result-empty" id="fullResultEmpty">기능을 선택하고 조회하면 결과가 전체 화면에 표시됩니다.</div></div>
   <footer class="full-result-foot"><button type="button" class="full-result-home" id="fullResultHome">기능 선택으로</button><button type="button" class="full-result-reset" id="fullResultReset">결과 초기화</button></footer>
 </section>
@@ -781,7 +781,34 @@ function catalogChoicesHtml(list,kind){
   if(!list.length)return '<div class="catalog-search-empty">표시할 항목이 없습니다.</div>';
   return list.map((x,i)=>`<button type="button" class="catalog-search-item" data-catalog-kind="${esc(kind)}" data-catalog-i="${i}"><b>${esc(x.name||'-')}</b><small>${esc(x.meta||x.code||'선택')}</small></button>`).join('');
 }
-function showCatalogSelected(title,x){
+async function runMarketOverview(x){
+  closeSheet();
+  resetResultZone();
+  openFullResult();
+  const name=x?.name||"선택 시장";
+  add(`${esc(name)} 시장의 실제 가격정보를 조회합니다.`,"user");
+  const loading=add(`<h3>🏪 ${esc(name)} 시장 가격정보</h3><div class="overview-loading">시장코드 ${esc(x?.code||"-")}로 실제 가격 API를 조회하고 있습니다...</div>`);
+  try{
+    const p={"ctgry_cd::EQ":PRICE_CATEGORY,"mrkt_cd::EQ":String(x?.code||"")};
+    const rows=await apiAll("/api/recent",cond(p),1000,12);
+    if(!rows.length){
+      loading.querySelector(".bubble").innerHTML=`<h3>🏪 ${esc(name)} 시장 가격정보</h3><div class="source"><span class="badge warn">0건</span> 선택한 시장코드로 최근가격 API를 조회했지만 현재 반환된 가격자료가 없습니다.</div><div class="result"><b>${esc(name)}</b><div class="kv"><b>시장코드</b><span>${esc(x?.code||"-")}</span>${x?.meta?`<b>지역/정보</b><span>${esc(x.meta)}</span>`:""}</div></div><div class="source">시장 조건을 임의로 해제하거나 다른 시장 자료로 대체하지 않습니다.</div>`;
+      return;
+    }
+    absorbPriceFacets(rows);
+    const body=resultLimit(rows,20).map(r=>`<div class="result"><b>${esc(firstField(r,["item_nm"])||"-")} · ${esc(firstField(r,["se_nm"])||"-")}</b><div class="kv"><b>시장</b><span>${esc(firstField(r,["mrkt_nm"])||name)}</span><b>지역</b><span>${esc(firstField(r,["sgg_nm"])||x?.meta||"-")}</span><b>품종/상태</b><span>${esc(firstField(r,["vrty_nm"])||"-")}</span><b>등급</b><span>${esc(gradeDisplay(firstField(r,["grd_nm"])||"-"))}</span><b>단위/규격</b><span>${esc(unitText(r))}</span><b>가격</b><span>${fmt(firstField(r,["exmn_dd_avg_prc","avgprc","prc"]))}원</span><b>기준일</b><span>${esc(firstField(r,["exmn_ymd"])||"-")}</span></div></div>`).join("");
+    loading.querySelector(".bubble").innerHTML=`<h3>🏪 ${esc(name)} 시장 가격정보</h3><div class="source"><span class="badge ok">실데이터</span> 선택한 시장코드와 일치하는 최근가격 API 원자료 ${fmt(rows.length)}건을 확인했습니다.</div>${body}<div class="source">시장코드 ${esc(x?.code||"-")}를 고정해 조회한 실제 공공데이터입니다.</div>`;
+  }catch(e){
+    loading.querySelector(".bubble").innerHTML=`<h3>시장정보 조회 오류</h3><div class="err">${esc(e.message||e)}</div><div class="source">시장코드는 정상 선택되었지만 가격 API 연결 또는 응답을 확인해야 합니다.</div>`;
+  }
+}
+async function showCatalogSelected(kind,title,x){
+  if(kind==="catalogGoods"){
+    return runItemOverview({code:String(x?.code||""),name:x?.name||title});
+  }
+  if(kind==="catalogMarkets"){
+    return runMarketOverview(x);
+  }
   closeSheet();
   resetResultZone();
   openFullResult();
@@ -807,7 +834,7 @@ function installCatalogDropdown(kind,cfg){
     const filtered=rows.filter(x=>!q||`${x.name} ${x.code} ${x.meta||''}`.toLowerCase().includes(q));
     head.textContent=`${cfg.title} · ${filtered.length}개`;
     list.innerHTML=catalogChoicesHtml(filtered,kind);
-    list.querySelectorAll('.catalog-search-item').forEach((b,i)=>b.onclick=()=>showCatalogSelected(cfg.title,filtered[i]));
+    list.querySelectorAll('.catalog-search-item').forEach((b,i)=>b.onclick=()=>showCatalogSelected(kind,cfg.title,filtered[i]));
   };
   const open=()=>{drop.classList.add('on');render();};
   const closeLater=()=>setTimeout(()=>{if(document.activeElement!==input&&!drop.matches(':hover'))drop.classList.remove('on')},160);
@@ -845,7 +872,7 @@ async function openCatalogSheet(kind){
   }
 }
 
-// v0.26: 홈 카드 hover 미리보기는 사용하지 않음. 목록은 기능 내부 검색창에서 표시한다.
+// v0.27: 홈 카드 hover 미리보기는 사용하지 않음. 목록은 기능 내부 검색창에서 표시한다.
 
 async function openMenu(m){
   nav.menu=m;nav.device=null;
@@ -1343,12 +1370,12 @@ async function checkApiHealth(){
     const h=await api("/health",{});
     if(h?.ok){
       if(dot)dot.style.background="#2fb344";
-      if(sub)sub.innerHTML=`<span class="dot"></span>aT 공공데이터 연계 · v0.26 · API 정상`;
+      if(sub)sub.innerHTML=`<span class="dot"></span>aT 공공데이터 연계 · v0.27 · API 정상`;
       return true;
     }
   }catch(e){}
   if(dot)dot.style.background="#d92d20";
-  if(sub)sub.innerHTML=`<span class="dot" style="background:#d92d20"></span>aT 공공데이터 연계 · v0.26 · 결과창 동작 FIX`;
+  if(sub)sub.innerHTML=`<span class="dot" style="background:#d92d20"></span>aT 공공데이터 연계 · v0.27 · 결과창 동작 FIX`;
   return false;
 }
 
@@ -1376,7 +1403,7 @@ function enableInstallDrag(){const b=document.getElementById("installBtn");let d
 async function installApp(){if(installWasDragged){installWasDragged=false;return}if(standalone())return;if(deferredInstallPrompt){deferredInstallPrompt.prompt();try{await deferredInstallPrompt.userChoice}catch(e){}deferredInstallPrompt=null;return}const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);add(`<h3>📲 앱 설치 안내</h3>${ios?"Safari의 공유 버튼을 누른 뒤 <b>홈 화면에 추가</b>를 선택하십시오.":"브라우저 메뉴(⋮)에서 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 선택하십시오."}`)}
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstallPrompt=e});window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("installBtn").classList.add("hidden")});document.getElementById("installBtn").onclick=installApp;
 
-const FONT_LEVEL_KEY="kafv_fish_price_font_level_v026";
+const FONT_LEVEL_KEY="kafv_fish_price_font_level_v027";
 const FONT_LEVELS=["normal","large","xlarge"];
 function applyFontLevel(level,save=true){
   if(!FONT_LEVELS.includes(level))level="normal";
@@ -1397,7 +1424,7 @@ function cycleFontLevel(){
   applyFontLevel(next,true);
 }
 document.getElementById("fontBtn").onclick=cycleFontLevel;
-document.getElementById("settingsBtn").onclick=()=>{nav.group=null;nav.menu=null;nav.device=null;setSheet(`${head("설정·데이터 원칙")}<div class="hint"><b>버전 v0.26 · 14개 조회기능 + 사용방법 + 전체화면 결과</b><br><br>① API Key는 GitHub/HTML에 저장하지 않고 Cloudflare Worker Secret에서 관리합니다.<br>② 품목만 필수이며 유통단계·품종/상태·등급·지역·시장은 전체(자동)로 넓게 시작할 수 있습니다.<br>③ 정확조건이 0건이면 Worker v0.7.2가 품목코드를 고정한 채 등급 → 품종/상태 → 유통단계 → 필요 시 거래일/시장/지역을 단계적으로 확대합니다.<br>④ 자동확대가 발생하면 결과에 어떤 조건이 완화됐는지 반드시 표시합니다.<br>⑤ 어기·비어기는 검색 차단조건으로 사용하지 않고 결과 해석정보로만 사용합니다.<br>⑥ 단위·규격/단위크기는 선택조건에서 제외하고 실제 API 원자료 값을 결과에서 표시합니다.<br>⑦ 품목명만 입력하면 Worker v0.7.2의 /api/item-overview가 8개 가격 Endpoint를 자동탐색합니다.<br>⑧ 경매·온라인은 가격 API와 코드체계가 달라 별도 명칭대응 방식으로 추가 탐색합니다.<br>⑨ 0건과 API 오류를 구분하며 원자료를 임의 생성하지 않습니다.</div>`) };
+document.getElementById("settingsBtn").onclick=()=>{nav.group=null;nav.menu=null;nav.device=null;setSheet(`${head("설정·데이터 원칙")}<div class="hint"><b>버전 v0.27 · 14개 조회기능 + 사용방법 + 전체화면 결과</b><br><br>① API Key는 GitHub/HTML에 저장하지 않고 Cloudflare Worker Secret에서 관리합니다.<br>② 품목만 필수이며 유통단계·품종/상태·등급·지역·시장은 전체(자동)로 넓게 시작할 수 있습니다.<br>③ 정확조건이 0건이면 Worker v0.7.2가 품목코드를 고정한 채 등급 → 품종/상태 → 유통단계 → 필요 시 거래일/시장/지역을 단계적으로 확대합니다.<br>④ 자동확대가 발생하면 결과에 어떤 조건이 완화됐는지 반드시 표시합니다.<br>⑤ 어기·비어기는 검색 차단조건으로 사용하지 않고 결과 해석정보로만 사용합니다.<br>⑥ 단위·규격/단위크기는 선택조건에서 제외하고 실제 API 원자료 값을 결과에서 표시합니다.<br>⑦ 품목명만 입력하면 Worker v0.7.2의 /api/item-overview가 8개 가격 Endpoint를 자동탐색합니다.<br>⑧ 경매·온라인은 가격 API와 코드체계가 달라 별도 명칭대응 방식으로 추가 탐색합니다.<br>⑨ 0건과 API 오류를 구분하며 원자료를 임의 생성하지 않습니다.</div>`) };
 
 window.addEventListener("DOMContentLoaded",()=>{
   try{applyFontLevel(localStorage.getItem(FONT_LEVEL_KEY)||"normal",false)}catch(_){applyFontLevel("normal",false)}
